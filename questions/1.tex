@@ -1,0 +1,82 @@
+\section{Ismertesse a C++ nyelvben alkalmazott bővítéseket az egyszerű adattípusok terén,
+valamint a konzol ki/bemenet megvalósításait!}
+
+\subsection{C++ bővítések az egyszerű adattípusok terén}
+
+A C++ a C nyelv típusrendszerére épül, de szigorúbb típusellenőrzést vezet be, és számos új elemmel bővíti azt a biztonságosabb és kényelmesebb programozás érdekében.
+
+\begin{itemize}
+    \item \textbf{Logikai típus (\texttt{bool}):}
+    \begin{itemize}
+        \item A C-vel ellentétben (ahol az egész számok 0/nem-0 értéke jelentette a logikát) a C++ bevezeti az önálló \texttt{bool} típust.
+        \item Lehetséges értékei: \texttt{true} (igaz) és \texttt{false} (hamis).
+        \item Memóriaigénye: implementációfüggő, de általában 1 bájt.
+    \end{itemize}
+
+    \item \textbf{Referencia típus (\texttt{\&}):}
+    \begin{itemize}
+        \item Ez egy már létező változó "álneve" (alias).
+        \item \textbf{Jellemzői:} Deklaráláskor azonnal inicializálni kell, és később nem állítható át más változóra.
+        \item \textbf{Előnye:} Lehetővé teszi a cím szerinti paraméterátadást a mutatók (pointerek) bonyolult szintaxisa nélkül (pl. \texttt{void fv(int \&x)}).
+    \end{itemize}
+
+    \item \textbf{Inicializálási módok bővülése:}
+    \begin{itemize}
+        \item \textbf{Konstruktor szintaxis:} \texttt{int a(5);} – úgy néz ki, mint egy függvényhívás.
+        \item \textbf{Egységes inicializálás (C++11):} \texttt{int a\{5\};} – ez a legbiztonságosabb forma (megakadályozza a szűkítő konverziót).
+    \end{itemize}
+
+    \item \textbf{Típuslevezetés (\texttt{auto}):}
+    \begin{itemize}
+        \item A fordító a kezdőérték alapján automatikusan határozza meg a változó típusát.
+        \item Példa: \texttt{auto x = 5.5;} (a típus \texttt{double} lesz).
+        \item Kötelező inicializálni a használatakor.
+    \end{itemize}
+
+    \item \textbf{\texttt{nullptr}:}
+    \begin{itemize}
+	    \item A típusbiztonság érdekében bevezették a \texttt{nullptr} kulcsszót a NULL makró (ami sima 0) helyett, így elkerülhetők a pointerek és egészek keveredéséből adódó hibák.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\subsection{Konzol Ki- és Bemenet (I/O) megvalósítása}
+
+A C++ az objektumorientált \texttt{iostream} könyvtárat használja a \texttt{cstdio} (printf/scanf) helyett/mellett. Az I/O műveletek adatfolyamokként (streamek) valósulnak meg.
+
+\begin{itemize}
+    \item \textbf{Könyvtár és Névtér:}
+    \begin{itemize}
+        \item Header fájl: \texttt{\#include <iostream>}
+        \item Minden elem az \texttt{std} névtérben található (pl. \texttt{std::cout}).
+    \end{itemize}
+
+    \item \textbf{Alapvető objektumok (Streamek):}
+    \begin{itemize}
+        \item \texttt{cin}: Szabványos bemenet (billentyűzet).
+        \item \texttt{cout}: Szabványos kimenet (képernyő/konzol).
+        \item \texttt{cerr}: Szabványos hibakimenet (pufferelés nélküli).
+        \item \texttt{clog}: Szabványos naplózó kimenet (pufferelt).
+    \end{itemize}
+
+    \item \textbf{Operátorok:}
+    \begin{itemize}
+        \item \textbf{Beszúró operátor (\texttt{<<}):} Adatot küld a kimeneti folyamra. Láncolható. \\
+        Példa: \texttt{cout << "Ertek: " << x;}
+        \item \textbf{Kiemelő operátor (\texttt{>>}):} Adatot olvas a bemeneti folyamról egy változóba. Automatikusan kezeli a típusokat és figyelmen kívül hagyja a szóközöket (whitespace). \\
+        Példa: \texttt{cin >> x;}
+    \end{itemize}
+
+    \item \textbf{Manipulátorok (Formázás):}
+    \begin{itemize}
+        \item A kimenet formázását végző speciális elemek.
+        \item \texttt{std::endl}: Új sor beszúrása és a puffer ürítése (flush).
+        \item További formázások az \texttt{<iomanip>} headerben: \texttt{setw()} (mezőszélesség), \texttt{setprecision()} (tizedesjegyek).
+    \end{itemize}
+
+    \item \textbf{Előnyök a C (printf) megoldással szemben:}
+    \begin{itemize}
+        \item \textbf{Típusbiztonság:} Nem kellenek formátumkódok (pl. \texttt{\%d}), a fordító felismeri a típusokat.
+        \item \textbf{Bővíthetőség:} Saját osztályokra/típusokra is túlterhelhetők a \texttt{<<} és \texttt{>>} operátorok.
+    \end{itemize}
+\end{itemize}

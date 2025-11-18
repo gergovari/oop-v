@@ -1,0 +1,11 @@
+\babel@toc {magyar}{}\relax 
+\contentsline {section}{\numberline {1}Ismertesse a C++ nyelvben alkalmazott bővítéseket az egyszerű adattípusok terén, valamint a konzol ki/bemenet megvalósításait!}{1}{}%
+\contentsline {subsection}{\numberline {1.1}C++ bővítések az egyszerű adattípusok terén}{1}{}%
+\contentsline {subsection}{\numberline {1.2}Konzol Ki- és Bemenet (I/O) megvalósítása}{2}{}%
+\contentsline {section}{\numberline {2}Ismertesse a csak C++ nyelvben alkalmazható típuskonverziót, valamint a header fájlok használatánál\\ alkalmazható egyszerűsítést!}{3}{}%
+\contentsline {subsection}{\numberline {2.1}C++ specifikus típuskonverziók (Casting)}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Header fájlok használatának egyszerűsítése}{3}{}%
+\contentsline {section}{\numberline {3}Ismertesse a referencia típusú változók deklarációját, használatát, és a referencia adattagot tartalmazó osztályok konstruktorának megvalósítását! Írjon példát a referencia típus használatára függvényben!}{4}{}%
+\contentsline {subsection}{\numberline {3.1}Referencia változók (Alias)}{4}{}%
+\contentsline {subsection}{\numberline {3.2}Referencia adattagok és a konstruktor}{4}{}%
+\contentsline {subsection}{\numberline {3.3}Referencia használata függvényekben}{4}{}%

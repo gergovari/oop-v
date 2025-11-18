@@ -1,0 +1,66 @@
+\section{Ismertesse a referencia típusú változók deklarációját, használatát, és a referencia adattagot tartalmazó osztályok konstruktorának megvalósítását! Írjon példát a referencia típus használatára függvényben!}
+
+\subsection{Referencia változók (Alias)}
+A referencia egy már létező objektum vagy változó \textbf{másodlagos neve} (álneve). A C++ nyelvben a pointerek biztonságosabb és kényelmesebb alternatívájaként szolgál számos esetben.
+
+\begin{itemize}
+    \item \textbf{Deklaráció:} A típus után tett \texttt{\&} jellel.
+    \item \textbf{Kötelező inicializálás:} Deklaráláskor azonnal hozzá kell kötni egy létező változóhoz.
+    \item \textbf{Rögzítettség:} Az inicializálás után \textbf{nem irányítható át} más változóra.
+    \item \textbf{Nincs NULL érték:} A referenciának mindig érvényes memóriaterületre kell mutatnia.
+\end{itemize}
+
+\begin{minted}[linenos=true]{cpp}
+int x = 10;
+int& ref = x;  // 'ref' mostantól 'x' álneve
+
+ref = 20;      // Ez valójában 'x'-et módosítja 20-ra
+// int& hibas; // HIBA: nincs inicializálva!
+\end{minted}
+
+\subsection{Referencia adattagok és a konstruktor}
+Ha egy osztály referencia típusú adattagot tartalmaz, speciális szabályok vonatkoznak a konstruktorra, mivel a referenciát létrehozáskor inicializálni kell.
+
+\begin{itemize}
+    \item \textbf{Probléma:} A konstruktor törzsének futásakor az adattagok már létrejöttek (memória lefoglalva), így ott már késő lenne értéket adni a referenciának (az már értékadás lenne, nem inicializálás).
+    \item \textbf{Megoldás:} Kötelező a \textbf{taginicializáló lista} (Member Initializer List) használata.
+\end{itemize}
+
+\begin{minted}{cpp}
+class AdatTarolo {
+    int& referenciaAdat; // Referencia adattag
+
+public:
+    // Konstruktor
+    AdatTarolo(int& kulsoValtozo) 
+        : referenciaAdat(kulsoValtozo) // Taginicializáló lista
+    {
+        // A törzsben (itt) már hiba lenne értéket adni neki először.
+    }
+};
+\end{minted}
+
+\subsection{Referencia használata függvényekben}
+A referenciák leggyakoribb felhasználása a függvényparamétereknél történik (\textit{Pass-by-Reference}).
+
+\begin{itemize}
+    \item \textbf{Hatékonyság:} Nem készül másolat az objektumról (nagy adatstruktúráknál kritikus).
+    \item \textbf{Módosíthatóság:} A függvény képes megváltoztatni a hívó fél eredeti változóját (kimenő paraméter).
+    \item \textbf{Konstans referencia:} Ha a másolást el akarjuk kerülni, de a módosítást tiltani szeretnénk: \texttt{const Type\&}.
+\end{itemize}
+
+\begin{minted}{cpp}
+// Két szám cseréje (referenciák nélkül nem működne másolás miatt)
+void csere(int& a, int& b) {
+    int temp = a;
+    a = b; // Az eredeti változót írja felül
+    b = temp;
+}
+
+int main() {
+    int x = 5, y = 10;
+    csere(x, y); 
+    // Itt: x = 10, y = 5
+    return 0;
+}
+\end{minted}
