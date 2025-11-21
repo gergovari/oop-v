@@ -1,0 +1,86 @@
+\section{Ismertesse az „std” névtér „string” osztályát! Adja meg (működés magyarázatával) gyakran használt operátorait és metódusait!}
+
+Az \texttt{std::string} a C++ szabványos könyvtárának (Standard Template Library - STL) része, amely a szöveges adatok dinamikus, biztonságos és kényelmes kezelését teszi lehetővé. A \texttt{<string>} header fájlban található.
+
+\subsection{Általános jellemzők}
+
+\begin{itemize}
+    \item \textbf{Dinamikus memóriakezelés:} Automatikusan foglalja és szabadítja fel a memóriát (RAII elv), a felhasználónak nem kell a \texttt{new/delete} párossal törődnie.
+    \item \textbf{Skálázhatóság:} Szükség esetén automatikusan növeli a kapacitását.
+    \item \textbf{C-kompatibilitás:} Könnyen konvertálható hagyományos C-stílusú (\texttt{const char*}) karaktertömbbé.
+    \item \textbf{Biztonság:} Mély másolatot (deep copy) készít értékadáskor, elkerülve a mutatók másolásából adódó hibákat.
+\end{itemize}
+
+\subsection{Gyakran használt operátorok}
+
+A \texttt{string} osztály számos operátort túlterhel a természetes használat érdekében:
+
+\begin{itemize}
+    \item \textbf{Értékadás (\texttt{=}):}
+        Másolatot készít a jobb oldali operandusról.
+    \item \textbf{Összefűzés (\texttt{+}):}
+        Két stringet vagy egy stringet és egy literált fűz össze, új stringet eredményezve.
+    \item \textbf{Hozzáfűzés (\texttt{+=}):}
+        A jobb oldali stringet a bal oldali végéhez fűzi (módosítja az eredetit).
+    \item \textbf{Indexelés (\texttt{[]}):}
+        Elérést biztosít az adott indexű karakterhez (0-tól indexelve). \textit{Megjegyzés:} Nem végez határellenőrzést (gyors, de veszélyes lehet).
+    \item \textbf{Összehasonlítás (\texttt{==, !=, <, >}):}
+        Lexikografikus (szótári) összehasonlítást végez a stringek tartalma alapján.
+\end{itemize}
+
+\subsection{Fontosabb tagfüggvények (metódusok)}
+
+\begin{itemize}
+    \item \textbf{Méret lekérdezése:}
+        \begin{itemize}
+            \item \texttt{length()} vagy \texttt{size()}: Visszaadja a karakterek számát.
+            \item \texttt{empty()}: Logikai igazat ad, ha a string üres (mérete 0).
+        \end{itemize}
+    
+    \item \textbf{Hozzáférés és módosítás:}
+        \begin{itemize}
+            \item \texttt{at(index)}: Mint a \texttt{[]}, de határellenőrzést végez (kivételt dob hiba esetén).
+            \item \texttt{clear()}: Törli a string tartalmát, mérete 0 lesz.
+            \item \texttt{push\_back(char)}: Egy karaktert fűz a string végére.
+        \end{itemize}
+
+    \item \textbf{Keresés és részszöveg:}
+        \begin{itemize}
+            \item \texttt{c\_str()}: Visszaad egy \texttt{const char*} mutatót a C-stílusú (null-terminált) változatra. (API hívásokhoz szükséges).
+            \item \texttt{substr(pos, len)}: Részszöveget ad vissza a \texttt{pos} indextől kezdve \texttt{len} hosszan.
+            \item \texttt{find(str)}: Megkeresi a paraméterként kapott szöveg első előfordulását. Ha nem találja, a visszatérési érték \texttt{std::string::npos}.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Példa a használatra}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <string>
+
+int main() {
+    // Konstruktor és értékadás
+    std::string s1 = "Hello";
+    std::string s2("Vilag");
+
+    // Operátorok: összefűzés és módosítás
+    std::string s3 = s1 + " " + s2; // "Hello Vilag"
+    s3 += "!";                      // "Hello Vilag!"
+
+    // Metódus: keresés
+    // npos: speciális konstans a "találat hiányának" jelzésére
+    if (s3.find("Vilag") != std::string::npos) {
+        std::cout << "A 'Vilag' szo megtalalhato." << std::endl;
+    }
+
+    // Metódus: részszöveg (6. indextől 5 karakter)
+    std::string sub = s3.substr(6, 5); // "Vilag"
+
+    // C-kompatibilitás
+    const char* c_ptr = s3.c_str(); 
+    
+    std::cout << "Hossz: " << s3.length() << std::endl;
+
+    return 0;
+}
+\end{minted}

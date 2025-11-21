@@ -1,0 +1,92 @@
+\section{Ismertesse a „barátság” elvét és típusait az osztályok definiálásánál!}
+
+\subsection{A barátság (friend) elve}
+A C++ nyelvben a \texttt{friend} kulcsszó lehetővé teszi az adatrejtés (encapsulation) szabályozott megkerülését. A barátnak deklarált külső egységek hozzáférhetnek az osztály \texttt{private} és \texttt{protected} tagjaihoz is.
+
+\begin{itemize}
+    \item \textbf{Kontrollált hozzáférés:} A barátságot mindig az az osztály \textit{adja}, amelyiknek az adatait védeni kell (az osztályon belül kell deklarálni a barátot). A barátságot nem lehet „elvenni” vagy kívülről kikényszeríteni.
+    \item \textbf{Nem szimmetrikus (Irányított):} Ha „A” osztály barátja „B”-nek, abból nem következik, hogy „B” is barátja „A”-nak.
+    \item \textbf{Nem tranzitív:} Ha „A” barátja „B”-nek, és „B” barátja „C”-nek, abból nem következik, hogy „A” hozzáfér „C” privát adataihoz (a barát barátja nem a barátom).
+    \item \textbf{Nem öröklődő:} A szülőosztály barátai nem válnak automatikusan a leszármazott osztály barátaivá.
+\end{itemize}
+
+\subsection{A barátság típusai}
+Három fő módon definiálhatunk barátságot attól függően, hogy kinek adunk hozzáférést:
+
+\begin{itemize}
+    \item \textbf{Barát függvény (Globális):}
+    \begin{itemize}
+        \item Egy önálló, nem osztályhoz tartozó függvény kap hozzáférést.
+        \item \textbf{Tipikus használat:} Operátor kiterjesztés (overloading), például \texttt{operator<<} (kimeneti adatfolyam) megvalósítása, ahol a bal oldali operandus (\texttt{std::ostream}) nem a mi osztályunk.
+    \end{itemize}
+    
+    \item \textbf{Barát osztály (Friend Class):}
+    \begin{itemize}
+        \item Egy másik osztály teljes egészében barátnak van jelölve.
+        \item A barát osztály \textit{minden} tagfüggvénye hozzáfér az eredeti osztály privát tagjaihoz.
+        \item \textbf{Tipikus használat:} Szorosan együttműködő osztályok (pl. \texttt{LinkedList} és \texttt{Node}, vagy \texttt{Manager} és \texttt{Worker}).
+    \end{itemize}
+
+    \item \textbf{Barát tagfüggvény (Friend Member Function):}
+    \begin{itemize}
+        \item Nem a teljes osztályt, csak egy másik osztály egyetlen konkrét metódusát tesszük baráttá.
+        \item Precízebb hozzáférést biztosít, de erősebb függőséget (include sorrend) igényel a definíciónál.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a barát osztály és a barát (globális) függvény használatát.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Tarolo {
+private:
+    int titkosAdat;
+
+public:
+    Tarolo(int adat) : titkosAdat(adat) {}
+
+    // 1. Barát osztály deklarációja
+    // A Ellenor osztály minden metódusa láthatja a titkosAdat-ot
+    friend class Ellenor;
+
+    // 2. Barát globális függvény deklarációja
+    // Ez a függvény nem tagja az osztálynak!
+    friend void kiir(const Tarolo& t);
+};
+
+// --- Barát osztály definíciója ---
+class Ellenor {
+public:
+    void vizsgal(const Tarolo& t) {
+        // Hozzáférés a privát adattaghoz
+        if (t.titkosAdat > 10) {
+            std::cout << "Az adat nagy." << std::endl;
+        }
+    }
+    
+    void nullaaz(Tarolo& t) {
+        // Módosítani is tudja
+        t.titkosAdat = 0;
+    }
+};
+
+// --- Barát globális függvény definíciója ---
+void kiir(const Tarolo& t) {
+    // Itt is elérjük a privát tagot
+    std::cout << "Ertek: " << t.titkosAdat << std::endl;
+}
+
+int main() {
+    Tarolo doboz(42);
+    
+    Ellenor inspektor;
+    inspektor.vizsgal(doboz); // OK
+    
+    kiir(doboz); // OK
+    
+    // doboz.titkosAdat; // HIBA: a main nem barát!
+    return 0;
+}
+\end{minted}

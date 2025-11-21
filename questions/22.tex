@@ -1,0 +1,96 @@
+\section{Ismertesse a másoló konstruktor megírásának szükségességét okozó szituációt! Honnan tudjuk eldönteni, hogy a fordító a másoló konstruktort, vagy az „=” operátort használja?}
+
+\subsection{Mikor szükséges saját másoló konstruktort írni?}
+Alapértelmezésben a fordító egy úgynevezett \textit{sekély másolatot} (shallow copy) készítő konstruktort generál, amely bitről-bitre lemásolja az adattagokat. Ez bizonyos esetekben végzetes hibát okoz.
+
+\begin{itemize}
+    \item \textbf{A problémás szituáció (Nyers pointerek):}
+    Ha az osztály egy pointert tartalmaz, amely dinamikusan foglalt memóriára (heap) mutat, a sekély másolás csak a pointer címét másolja át, nem a mögötte lévő adatot.
+    
+    \item \textbf{Következmények:}
+    \begin{enumerate}
+        \item \textbf{Osztozott erőforrás:} Két különböző objektum ugyanazt a memóriaterületet használja és módosítja véletlenül.
+        \item \textbf{Double Free hiba:} Amikor az objektumok megszűnnek (scope vége), mindkettő megpróbálja felszabadítani (\texttt{delete}) ugyanazt a memóriacímet. Az első sikerül, a második programösszeomlást (crash) okoz.
+    \end{enumerate}
+
+    \item \textbf{Megoldás (Mély másolás / Deep Copy):}
+    Saját másoló konstruktort kell írni, amely:
+    \begin{enumerate}
+        \item Új memóriaterületet foglal az új objektumnak.
+        \item Átmásolja az \textit{értékeket} az eredeti területről az újra.
+    \end{enumerate}
+    \textit{Megjegyzés: Ez a „Rule of Three” (Három Szabálya) egyik alappillére.}
+\end{itemize}
+
+\subsection{Másoló konstruktor vs. Értékadó operátor}
+Bár mindkét művelet során adatok kerülnek egyik objektumból a másikba, és szintaktikailag mindkettőben szerepelhet az egyenlőségjel, a különbség az objektum \textbf{létrejöttének állapotában} keresendő.
+
+\begin{itemize}
+    \item \textbf{Másoló konstruktor (Copy Constructor):}
+    \begin{itemize}
+        \item \textbf{Mikor:} Amikor egy \textbf{új} objektumot hozunk létre egy már létező mintájára.
+        \item \textbf{Kulcs:} Az objektum a sor végrehajtása előtt még nem létezett.
+        \item \textbf{Szintaxis:} \texttt{Osztaly A = B;} vagy \texttt{Osztaly A(B);}
+    \end{itemize}
+
+    \item \textbf{Értékadó operátor (Assignment Operator):}
+    \begin{itemize}
+        \item \textbf{Mikor:} Amikor egy \textbf{már létező, inicializált} objektum értékét írjuk felül egy másikéval.
+        \item \textbf{Kulcs:} Az objektum már létezik a memóriában, és van érvényes (vagy érvénytelen) állapota, amit előbb esetleg takarítani kell.
+        \item \textbf{Szintaxis:} \texttt{A = B;} (ahol A-t korábban már deklaráltuk).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a mély másolás szükségességét és a hívások megkülönböztetését.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Buffer {
+    int* data;
+
+public:
+    // Sima konstruktor
+    Buffer(int value) {
+        data = new int(value);
+        std::cout << "Konstruktor (new)" << std::endl;
+    }
+
+    // SAJÁT MÁSOLÓ KONSTRUKTOR (Deep Copy)
+    // Szükséges, különben a pointer címe másolódna!
+    Buffer(const Buffer& other) {
+        data = new int(*other.data); // Új memória, érték másolása
+        std::cout << "Masolo Konstruktor (Deep Copy)" << std::endl;
+    }
+
+    // ÉRTÉKADÓ OPERÁTOR
+    Buffer& operator=(const Buffer& other) {
+        if (this != &other) { // Ön-értékadás ellenőrzése
+            delete data;      // Régi adat törlése (FONTOS különbség!)
+            data = new int(*other.data); // Új adat másolása
+        }
+        std::cout << "Ertekado operator (=)" << std::endl;
+        return *this;
+    }
+
+    ~Buffer() { delete data; }
+};
+
+int main() {
+    Buffer b1(10); // Sima konstruktor
+
+    // 1. ESET: MÁSOLÓ KONSTRUKTOR
+    // Új objektum (b2) jön létre b1 mintájára.
+    // A fordító ezt látja: Buffer b2(b1);
+    Buffer b2 = b1; 
+
+    Buffer b3(20); // Sima konstruktor
+
+    // 2. ESET: ÉRTÉKADÓ OPERÁTOR
+    // A b3 objektum már létezik! Csak az értékét cseréljük le.
+    b3 = b1; 
+
+    return 0;
+}
+\end{minted}

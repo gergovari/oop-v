@@ -1,0 +1,94 @@
+\section{Ismertesse az „overload” és „override” elvek közti különbséget, amennyiben ős és leszármazottban történő előfordulásról van szó!}
+
+A C++ programozásban gyakran kevert két fogalom a függvények túlterhelése (overloading) és felüldefiniálása (overriding). Bár mindkettő azonos nevű függvényekkel dolgozik, a működési mechanizmusuk és céljuk alapvetően eltérő, különösen öröklődési viszonyban.
+
+\subsection{1. Overload (Túlterhelés)}
+
+A túlterhelés azt jelenti, hogy több azonos nevű, de eltérő paraméterlistájú függvény létezik.
+
+\begin{itemize}
+    \item \textbf{Szabály:} A név azonos, de a szignatúrának (paraméterek száma vagy típusa) különböznie kell.
+    \item \textbf{Kötés ideje:} Fordítási időben dől el (Korai kötés / Static polymorphism).
+    \item \textbf{Öröklődésnél (Veszélyforrás):}
+        \begin{itemize}
+            \item Ha a leszármazottban létrehozunk egy függvényt ugyanazzal a névvel, de más paraméterekkel, az \textbf{elfedi (hide)} az ősosztály azonos nevű függvényeit.
+            \item Ez technikailag \textit{név elfedés} (name hiding), nem klasszikus túlterhelés, hacsak nem használjuk a \texttt{using Base::fgv;} utasítást a láthatóság visszaállítására.
+        \end{itemize}
+\end{itemize}
+
+\subsection{2. Override (Felüldefiniálás)}
+
+A felüldefiniálás azt jelenti, hogy a leszármazott osztály megváltoztatja (lecseréli) az ősosztálytól örökölt viselkedést.
+
+\begin{itemize}
+    \item \textbf{Szabály:} A névnek és a paraméterlistának (szignatúrának) \textbf{teljesen egyeznie} kell.
+    \item \textbf{Feltétel:} Az ősosztályban a függvénynek \texttt{virtual}-nak kell lennie.
+    \item \textbf{Kötés ideje:} Futásidőben dől el (Késői kötés / Dynamic polymorphism).
+    \item \textbf{Cél:} A polimorfizmus megvalósítása (ős típusú mutatón keresztül a specifikus metódus hívása).
+\end{itemize}
+
+\subsection{Összehasonlító táblázat}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Tulajdonság} & \textbf{Overload (Túlterhelés)} & \textbf{Override (Felüldefiniálás)} \\ \hline
+    \textbf{Hatókör} & Általában egy osztályon belül (vagy \texttt{using}-gal) & Öröklődési láncban (Ős $\leftrightarrow$ Utód) \\ \hline
+    \textbf{Szignatúra} & \textbf{Különböző} kell legyen & \textbf{Azonosnak} kell lennie \\ \hline
+    \textbf{Kulcsszó} & Nincs speciális kulcsszó & \texttt{virtual} (ősben), \texttt{override} (utódban) \\ \hline
+    \textbf{Kötés} & Statikus (Fordítási idő) & Dinamikus (Futási idő) \\ \hline
+    \textbf{Visszatérés} & Eltérhet (de önmagában nem elég) & Egyeznie kell (vagy kovariáns lehet) \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Példa a két esetre}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <string>
+
+class Os {
+public:
+    // Virtuális függvény -> Override-olható
+    virtual void kiir() { 
+        std::cout << "Os: parameter nelkul" << std::endl; 
+    }
+
+    // Sima függvény -> Overload-olható
+    void szamol(int a) { 
+        std::cout << "Os szamol: " << a << std::endl; 
+    }
+};
+
+class Utod : public Os {
+public:
+    // 1. OVERRIDE (Felüldefiniálás)
+    // Ugyanaz a név és paraméter, 'virtual' az ősben.
+    // Lecseréli az ős viselkedését polimorf használatkor.
+    void kiir() override { 
+        std::cout << "Utod: parameter nelkul" << std::endl; 
+    }
+
+    // 2. OVERLOAD (Túlterhelés / Elfedés)
+    // Ugyanaz a név, de MÁS paraméter.
+    // FIGYELEM: Ez elrejti az ős 'szamol(int)' függvényét!
+    void szamol(std::string s) {
+        std::cout << "Utod szoveggel: " << s << std::endl;
+    }
+    
+    // Ha el akarjuk érni az int-es változatot is az Utód objektumon:
+    using Os::szamol; 
+};
+
+int main() {
+    Utod u;
+    u.kiir();          // Utod::kiir (Override miatt)
+    u.szamol("Szia");  // Utod::szamol(string)
+    
+    // u.szamol(10);   // HIBA lenne a 'using' sor nélkül (elfedés miatt)
+    u.szamol(10);      // Így már működik (Overload)
+
+    return 0;
+}
+\end{minted}

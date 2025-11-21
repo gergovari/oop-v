@@ -1,0 +1,66 @@
+\section{Ismertesse, hogy mikor alkalmazható egy t-norma, s-norma, komplemens definicióit tartalmazó szabályrendszer fuzzy halmazműveletekhez! Mit alkotnak ilyenkor a szabályrendszer elemei?}
+
+A fuzzy logikában a különböző műveleteket (metszet, unió, negáció) nem választhatjuk meg egymástól függetlenül, ha konzisztens matematikai rendszert szeretnénk építeni. A három operátornak összhangban kell lennie egymással.
+
+\subsection{Alkalmazhatóság feltétele: A De Morgan Hármas}
+
+Egy t-norma ($T$), s-norma ($S$) és komplemens ($c$) definícióit tartalmazó szabályrendszer akkor alkalmazható helyesen fuzzy halmazműveletekhez, ha azok kielégítik a \textbf{dualitás elvét}, azaz egymás duális párjai a megadott negációra nézve.
+
+Ezt a rendszert \textbf{De Morgan Hármasnak} (De Morgan Triplet) nevezzük.
+
+A rendszer akkor konzisztens, ha teljesülnek az általánosított De Morgan azonosságok minden $x, y \in [0, 1]$ esetén:
+
+$$ c(S(x, y)) = T(c(x), c(y)) $$
+$$ c(T(x, y)) = S(c(x), c(y)) $$
+
+Ha a standard komplemenst használjuk ($c(x) = 1-x$), akkor a feltétel egyszerűsödik:
+$$ 1 - S(x, y) = T(1-x, 1-y) $$
+
+\textbf{Példák érvényes hármasokra:}
+\begin{itemize}
+    \item \textbf{Zadeh (Standard):} Min, Max, $1-x$.
+    \item \textbf{Szorzat (Probabilisztikus):} $xy$, $x+y-xy$, $1-x$.
+    \item \textbf{Lukasiewicz (Korlátos):} $\max(0, x+y-1)$, $\min(1, x+y)$, $1-x$.
+\end{itemize}
+
+\subsection{Mit alkotnak az elemek?}
+
+Ha a fenti feltételek teljesülnek, a $([0, 1], T, S, c)$ struktúra egy \textbf{De Morgan Algebrát} alkot.
+
+Ez az algebra hasonlít a klasszikus Boole-algebrára, de \textbf{két fontos axióma NEM teljesül} benne általánosan:
+
+\begin{enumerate}
+    \item \textbf{A harmadik kizárásának elve (Law of Excluded Middle):}
+        A klasszikus logikában $A \cup \neg A = 1$. A fuzzy logikában általában:
+        $$ S(x, c(x)) \neq 1 $$
+        (Pl. Zadeh operátoroknál $0.5 \cup 0.5 = 0.5$).
+    \item \textbf{Az ellentmondásmentesség elve (Law of Contradiction):}
+        A klasszikus logikában $A \cap \neg A = 0$. A fuzzy logikában általában:
+        $$ T(x, c(x)) \neq 0 $$
+\end{enumerate}
+
+\textbf{Következmény:} A fuzzy logika matematikailag egy disztributív (általában), De Morgan algebra a $[0, 1]$ intervallumon, amely a crisp (0 vagy 1) értékek esetén Boole-algebrává degenerálódik.
+
+\begin{minted}{cpp}
+// Példa: A Lukasiewicz hármas implementációja (De Morgan Triplet)
+#include <algorithm>
+#include <iostream>
+
+// Komplemens: 1 - x
+float c(float x) { return 1.0f - x; }
+
+// T-norma (Lukasiewicz): max(0, a + b - 1)
+float t_norm(float a, float b) { return std::max(0.0f, a + b - 1.0f); }
+
+// S-norma (Lukasiewicz): min(1, a + b)
+float s_norm(float a, float b) { return std::min(1.0f, a + b); }
+
+bool check_de_morgan(float a, float b) {
+    // Ellenőrzés: NOT (A OR B) == (NOT A) AND (NOT B)
+    float left_side = c(s_norm(a, b));
+    float right_side = t_norm(c(a), c(b));
+    
+    // Lebegőpontos összehasonlításnál epszilon kellene, de elvben egyenlőek
+    return left_side == right_side; 
+}
+\end{minted}

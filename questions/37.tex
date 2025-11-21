@@ -1,0 +1,91 @@
+\section{Ismertesse az „aggregáció” elvet osztályok egymásba ágyazására!}
+
+Az aggregáció az objektumorientált programozásban a „tartalmazás” (association) egy speciális formája. Hasonló a kompozícióhoz (mindkettő „has-a” kapcsolat), de a kapcsolat erőssége és az objektumok élettartama alapvetően eltér.
+
+\subsection{Az aggregáció jellemzői}
+
+\begin{itemize}
+    \item \textbf{Laza kapcsolat (Weak association):} A tartalmazó objektum (Egész) és a tartalmazott objektum (Rész) kapcsolata nem kizárólagos.
+    \item \textbf{Független élettartam:} A „rész” objektum létezhet az „egész” nélkül is. Ha a tartalmazó objektum megszűnik, a benne hivatkozott objektum \textbf{nem} semmisül meg automatikusan.
+    \item \textbf{Megosztott birtoklás:} Ugyanaz a „rész” objektum egyszerre tartozhat több különböző „egészhez” is (pl. egy Tanár taníthat több Osztályban is).
+\end{itemize}
+
+\subsection{Megvalósítás C++ nyelven}
+
+Technikailag az aggregációt mutatók (pointerek) vagy referenciák használatával valósítjuk meg, nem érték szerinti tárolással.
+
+\begin{itemize}
+    \item \textbf{Adattag:} Az osztály egy mutatót (\texttt{T*}) vagy referenciát (\texttt{T\&}) tárol a másik osztályra.
+    \item \textbf{Konstruktor:} A külső objektumot általában paraméterként kapja meg a konstruktor vagy egy setter metódus (nem ő hozza létre \texttt{new}-val).
+    \item \textbf{Destruktor:} A tartalmazó objektum destruktora \textbf{nem} hívja meg a \texttt{delete}-t a hivatkozott objektumra (hiszen nem ő a tulajdonosa).
+\end{itemize}
+
+\subsection{Példa: Autó és Sofőr}
+
+Az alábbi példában az Autó aggregálja a Sofőrt. A Sofőr létezik az Autó előtt is, és az Autó megsemmisülése után is tovább él.
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <string>
+
+// A "rész" osztály (ami független is lehet)
+class Sofor {
+public:
+    std::string nev;
+    Sofor(std::string n) : nev(n) {}
+    
+    void vezet() {
+        std::cout << nev << " vezeti az autot." << std::endl;
+    }
+};
+
+// Az "egész" osztály
+class Auto {
+private:
+    // Aggregáció: Mutatót tárolunk, nem magát az objektumot!
+    Sofor* sofor; 
+
+public:
+    // Kezdetben lehet, hogy nincs sofőr (nullptr)
+    Auto() : sofor(nullptr) {}
+
+    // Sofőr hozzárendelése (nem itt hozzuk létre!)
+    void setSofor(Sofor* s) {
+        sofor = s;
+    }
+
+    void indul() {
+        if (sofor != nullptr) {
+            sofor->vezet();
+        } else {
+            std::cout << "Nincs sofor, az auto nem indul." << std::endl;
+        }
+    }
+    
+    // Destruktor: NEM töröljük a sofőrt, mert nem mi birtokoljuk!
+    ~Auto() {
+        std::cout << "Az auto megsemmisult." << std::endl;
+    }
+};
+
+int main() {
+    // 1. Létrehozzuk a sofőrt (független objektum)
+    Sofor* janos = new Sofor("Janos");
+
+    {
+        // 2. Létrehozunk egy autót egy belső blokkban
+        Auto taxi;
+        taxi.setSofor(janos); // Összekapcsoljuk őket
+        taxi.indul();
+        
+    } // 3. Itt az 'Auto' (taxi) megsemmisül, lefut a destruktora
+
+    // 4. A 'Sofor' (janos) MÉG MINDIG LÉTEZIK és használható
+    std::cout << "Janos meg mindig megvan: " << janos->nev << std::endl;
+
+    // A tulajdonos felelőssége a törlés
+    delete janos; 
+    
+    return 0;
+}
+\end{minted}

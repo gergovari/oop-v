@@ -1,0 +1,93 @@
+\section{Ismertesse a statikus adattagok tulajdonságait, megadási és elérési módjait!}
+
+\subsection{Alapvető tulajdonságok}
+A statikus (\texttt{static}) adattagok olyan változók, amelyek nem egy konkrét objektumpéldányhoz, hanem magához az osztályhoz tartoznak.
+
+\begin{itemize}
+    \item \textbf{Közös állapot:} Az osztály minden példánya ugyanazon az egyetlen változón osztozik. Ha az egyik objektum módosítja, az összes többi is az új értéket látja.
+    \item \textbf{Példányfüggetlenség:} A statikus adattag akkor is létezik és elérhető, ha az osztályból még egyetlen példányt sem hoztunk létre.
+    \item \textbf{Élettartam:} A program indulásakor (vagy az első használatkor) jönnek létre, és a program futásának végéig a memóriában maradnak (static storage duration).
+    \item \textbf{Láthatóság:} Ugyanúgy vonatkoznak rájuk az elérési módosítók (\texttt{public}, \texttt{private}, \texttt{protected}), mint a normál adattagokra.
+\end{itemize}
+
+\subsection{Deklaráció és Definíció (Megadás)}
+A statikus adattagok kezelése két lépésből áll (kivéve speciális eseteket): deklaráció az osztályon belül, és definíció (memória-allokáció) az osztályon kívül.
+
+\begin{itemize}
+    \item \textbf{Deklaráció (Header fájlban):}
+    Az osztály definícióján belül a \texttt{static} kulcsszóval jelöljük meg a változót. Ez csak a típusát és nevét közli a fordítóval.
+    
+    \item \textbf{Definíció (Forrásfájlban/.cpp):}
+    Mivel a statikus tag nem tartozik példányhoz, a memóriát globális szinten kell lefoglalni neki, általában a .cpp fájlban. Itt már nem kell a \texttt{static} kulcsszó, de hivatkozni kell az osztályra (\texttt{Osztaly::}).
+    
+    \item \textbf{Kivételek (Inicializálás az osztályon belül):}
+    \begin{itemize}
+        \item \textbf{const integral típusok:} Pl. \texttt{static const int MAX = 10;} megengedett az osztályon belül.
+        \item \textbf{inline static (C++17):} A \texttt{inline static} kulcsszóval ellátott tagok definíciója és inicializálása is történhet az osztályon belül, így nem kell külön .cpp definíció.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Elérési módok}
+A statikus adattagokhoz (ha publikusak) kétféleképpen férhetünk hozzá:
+
+\begin{itemize}
+    \item \textbf{Osztálynév minősítéssel (Ajánlott):}
+    Mivel az adat az osztályhoz tartozik, a \texttt{OsztalyNev::adattag} forma a legkifejezőbb. Ez egyértelműsíti, hogy nem példánytagról van szó.
+    
+    \item \textbf{Objektumpéldányon keresztül:}
+    Használható az \texttt{objektum.adattag} vagy \texttt{pointer->adattag} forma is, de ez félrevezető lehet, mert azt sugallja, mintha az adat az objektumhoz tartozna.
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa egy számlálót valósít meg, amely nyilvántartja, hány élő példány van az osztályból.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Player {
+private:
+    // 1. Deklaráció az osztályban
+    static int playerCount; 
+
+public:
+    Player() {
+        // Minden új példány növeli a közös számlálót
+        playerCount++; 
+    }
+
+    ~Player() {
+        // Megszűnéskor csökkentjük
+        playerCount--; 
+    }
+
+    // Statikus tagfüggvény a privát statikus adattag eléréséhez
+    static int getCount() {
+        return playerCount;
+    }
+};
+
+// 2. Definíció és inicializálás az osztályon kívül (globális scope)
+// Itt foglalódik le a memória.
+int Player::playerCount = 0;
+
+int main() {
+    // Elérés példányosítás előtt (statikus metóduson keresztül)
+    std::cout << "Jatekosok: " << Player::getCount() << std::endl; // 0
+
+    Player p1;
+    Player p2;
+
+    // Elérés osztálynévvel (ajánlott)
+    std::cout << "Jatekosok: " << Player::getCount() << std::endl; // 2
+    
+    {
+        Player p3;
+        // Elérés objektumon keresztül (működik, de nem idiomatikus)
+        // Bár p3.getCount()-ot írunk, ez statikus kötés
+        std::cout << "Jatekosok: " << p3.getCount() << std::endl; // 3
+    } // p3 megsemmisül
+
+    std::cout << "Jatekosok: " << Player::getCount() << std::endl; // 2
+    return 0;
+}
+\end{minted}

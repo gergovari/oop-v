@@ -1,0 +1,114 @@
+\section{Ismertesse az STL tároló adaptereket és működésüket! Melyik mire használható?}
+
+Az STL tároló adapterek (Container Adapters) nem önálló adatszerkezetek, hanem meglévő szekvenciális tárolókra (pl. \texttt{vector}, \texttt{deque}, \texttt{list}) épülő burkoló osztályok. Céljuk, hogy korlátozzák és specializálják a hozzáférést egy bizonyos működési elv (pl. LIFO vagy FIFO) szerint.
+
+Közös jellemzőjük, hogy \textbf{nem támogatják az iterátorokat}, tehát az elemeket nem lehet szabadon bejárni, csak a szigorú szabályok szerint elérni.
+
+\subsection{1. std::stack (Verem)}
+
+
+
+A \textbf{LIFO} (Last In, First Out – Utolsóként be, elsőként ki) elvet valósítja meg.
+
+\begin{itemize}
+    \item \textbf{Működés:} Elemeket csak a "tetejére" lehet helyezni, és csak onnan lehet elvenni.
+    \item \textbf{Alapértelmezett tároló:} \texttt{std::deque} (de használható \texttt{vector} vagy \texttt{list} is).
+    \item \textbf{Fő metódusok:}
+        \begin{itemize}
+            \item \texttt{push()}: Elem felhelyezése.
+            \item \texttt{pop()}: A legfelső elem eltávolítása (visszatérési érték nélkül).
+            \item \texttt{top()}: A legfelső elem lekérdezése (referenciát ad).
+        \end{itemize}
+    \item \textbf{Felhasználás:}
+        \begin{itemize}
+            \item Visszavonás (Undo) műveletek.
+            \item Függvényhívási lánc (Call stack) szimulálása.
+            \item Szintaktikai elemzés (pl. zárójelek párba állítása).
+        \end{itemize}
+\end{itemize}
+
+\subsection{2. std::queue (Sor)}
+
+
+
+A \textbf{FIFO} (First In, First Out – Elsőként be, elsőként ki) elvet valósítja meg.
+
+\begin{itemize}
+    \item \textbf{Működés:} Az egyik végén (back) helyezzük be az elemeket, a másik végén (front) vesszük ki.
+    \item \textbf{Alapértelmezett tároló:} \texttt{std::deque} (lehet \texttt{list} is, de \texttt{vector} NEM, mert az elején való törlés nem hatékony).
+    \item \textbf{Fő metódusok:}
+        \begin{itemize}
+            \item \texttt{push()}: Elem hozzáadása a sor végére.
+            \item \texttt{pop()}: Elem eltávolítása a sor elejéről.
+            \item \texttt{front()}: Az első elem lekérdezése.
+            \item \texttt{back()}: Az utolsó elem lekérdezése.
+        \end{itemize}
+    \item \textbf{Felhasználás:}
+        \begin{itemize}
+            \item Pufferelés (Producer-Consumer probléma).
+            \item Nyomtatási feladatok ütemezése.
+            \item Szélességi bejárás (BFS) gráfokban.
+        \end{itemize}
+\end{itemize}
+
+\subsection{3. std::priority\_queue (Prioritásos sor)}
+
+
+
+[Image of binary heap data structure]
+
+
+Olyan sor, ahol az elemek nem érkezési, hanem \textbf{prioritási sorrendben} (alapértelmezésben csökkenő, azaz a legnagyobb van elöl) jönnek ki.
+
+\begin{itemize}
+    \item \textbf{Működés:} A háttérben egy \textbf{Heap (Kupac)} adatszerkezetet tart fenn. A beszúrás és kivétel logaritmikus idejű ($O(\log N)$).
+    \item \textbf{Alapértelmezett tároló:} \texttt{std::vector}.
+    \item \textbf{Fő metódusok:}
+        \begin{itemize}
+            \item \texttt{push()}: Elem beszúrása (a helyére kerül a prioritás szerint).
+            \item \texttt{pop()}: A legmagasabb prioritású elem eltávolítása.
+            \item \texttt{top()}: A legmagasabb prioritású elem lekérdezése.
+        \end{itemize}
+    \item \textbf{Felhasználás:}
+        \begin{itemize}
+            \item Dijkstra legrövidebb út algoritmus.
+            \item Operációs rendszer feladatütemezője.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Példa a használatra}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <stack>
+#include <queue>
+#include <vector>
+
+int main() {
+    // 1. Stack (LIFO)
+    std::stack<int> s;
+    s.push(10);
+    s.push(20); 
+    // Teteje: 20, Alatta: 10
+    std::cout << "Stack teteje: " << s.top() << std::endl; // 20
+    s.pop(); // 20 torlese
+
+    // 2. Queue (FIFO)
+    std::queue<int> q;
+    q.push(10);
+    q.push(20);
+    // Eleje: 10, Vege: 20
+    std::cout << "Sor eleje: " << q.front() << std::endl; // 10
+    q.pop(); // 10 torlese
+
+    // 3. Priority Queue (Max Heap)
+    std::priority_queue<int> pq;
+    pq.push(10);
+    pq.push(50);
+    pq.push(30);
+    // A legnagyobb kerul legelore automatikusan
+    std::cout << "Legnagyobb elem: " << pq.top() << std::endl; // 50
+    
+    return 0;
+}
+\end{minted}

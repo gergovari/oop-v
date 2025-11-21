@@ -1,0 +1,81 @@
+\section{Ismertesse a „static\_cast” és „dynamic\_cast” kulcsszavak működését! Hol fordulhat elő hibásan interpretált memória-terület?}
+
+A C++ nyelvben a típuskonverziók (casting) biztonságosabbá tételére vezették be az új típusú kasztoló operátorokat a C-stílusú \texttt{(type)value} helyett. A két leggyakrabban használt operátor eltérő időben és módon működik.
+
+\subsection{static\_cast (Fordítási idejű konverzió)}
+
+Ez a legáltalánosabb konverzió, amely fordítási időben (compile-time) történik.
+
+\begin{itemize}
+    \item \textbf{Működés:} A fordítóra bízza a konverzió elvégzését az ismert típusinformációk alapján. Nincs futásidejű ellenőrzés (overhead).
+    \item \textbf{Felhasználás:}
+        \begin{itemize}
+            \item Numerikus típusok között (pl. \texttt{float} $\rightarrow$ \texttt{int}).
+            \item Öröklődési láncban felfelé (Upcast): Mindig biztonságos.
+            \item Öröklődési láncban lefelé (Downcast): \textbf{Veszélyes}, mert a fordító nem ellenőrzi, hogy a mutató ténylegesen arra a típusra mutat-e.
+        \end{itemize}
+\end{itemize}
+
+\subsection{dynamic\_cast (Futásidejű konverzió)}
+
+Kifejezetten polimorf osztályok (ahol van legalább egy \texttt{virtual} függvény) közötti biztonságos navigációra szolgál.
+
+\begin{itemize}
+    \item \textbf{Működés:} Futásidőben (runtime) ellenőrzi az objektum valódi típusát az RTTI (Run-Time Type Information) segítségével.
+    \item \textbf{Feltétel:} Az osztálynak polimorfnak kell lennie (kell \texttt{vtable}).
+    \item \textbf{Eredmény:}
+        \begin{itemize}
+            \item \textbf{Pointer esetén:} Ha a konverzió sikertelen (az objektum nem a kért típusú), \texttt{nullptr}-t ad vissza.
+            \item \textbf{Referencia esetén:} Ha sikertelen, \texttt{std::bad\_cast} kivételt dob.
+        \end{itemize}
+    \item \textbf{Költség:} Lassabb a \texttt{static\_cast}-nál a futásidejű ellenőrzés miatt.
+\end{itemize}
+
+\subsection{Hibásan interpretált memória-terület (Veszélyforrás)}
+
+A hibás memória-interpretáció a \textbf{\texttt{static\_cast} helytelen használatakor}, kifejezetten a „Downcast” (ős $\rightarrow$ utód konverzió) során fordulhat elő.
+
+\begin{itemize}
+    \item \textbf{A szituáció:} Van egy \texttt{Base*} mutatónk, amely valójában egy \texttt{Base} példányra (vagy egy másik ágon lévő \texttt{DerivedA}-ra) mutat.
+    \item \textbf{A hiba:} Ezt a mutatót \texttt{static\_cast}-tal kényszerítjük egy \texttt{DerivedB*} típusra.
+    \item \textbf{Következmény (Undefined Behavior):}
+        \begin{itemize}
+            \item A fordító elfogadja a kérést („te tudod, mit csinálsz” alapon).
+            \item Amikor a program megpróbálja elérni a \texttt{DerivedB} egyedi adattagjait a mutatón keresztül, a memóriában lévő \textbf{szemetet} vagy \textbf{más változók bájtjait} fogja az adott adattagként értelmezni.
+            \item Ez memóriasérüléshez vagy összeomláshoz vezet.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Példa a működésre és a hibára}
+
+\begin{minted}{cpp}
+#include <iostream>
+
+class Base { public: virtual ~Base() {} }; // Polimorf ős
+class DerivedA : public Base { public: int a_data = 10; };
+class DerivedB : public Base { public: int b_data = 20; };
+
+int main() {
+    Base* ptr = new DerivedA(); // Tényleges típus: A
+
+    // 1. dynamic_cast (Biztonságos)
+    // Megpróbáljuk B-ként kezelni -> SIKERTELEN lesz
+    DerivedB* b_safe = dynamic_cast<DerivedB*>(ptr);
+    if (b_safe == nullptr) {
+        std::cout << "Dynamic cast: Ez nem DerivedB!" << std::endl;
+    }
+
+    // 2. static_cast (Veszélyes / Hibás)
+    // Kényszerítjük, hogy B-ként kezelje az A-t.
+    // A fordító engedi, de a futáskor baj lesz.
+    DerivedB* b_unsafe = static_cast<DerivedB*>(ptr);
+    
+    // HIBA: Olyan memóriaterületet olvasunk 'b_data' néven, 
+    // ami valójában az 'DerivedA' objektum része (vagy szemét).
+    // Ez a "hibásan interpretált memória".
+    std::cout << "Static cast ertek (szemet): " << b_unsafe->b_data << std::endl;
+
+    delete ptr;
+    return 0;
+}
+\end{minted}

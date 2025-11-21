@@ -1,0 +1,66 @@
+\section{Ismertesse a kommutatív műveletek átdefiniálási lehetőségét! Miért nem tudjuk a tagfüggvényes módszert alkalmazni?}
+
+\subsection{A probléma: Miért nem jó a tagfüggvény?}
+A kommutativitás (felcserélhetőség) azt jelenti, hogy a művelet eredménye független az operandusok sorrendjétől (pl. $A + B = B + A$). Vegyes típusú műveleteknél (pl. \texttt{Objektum} és \texttt{int}) a tagfüggvényes megközelítés aszimmetrikus.
+
+\begin{itemize}
+    \item \textbf{Bal oldali kötöttség:} Tagfüggvényként definiált operátor esetén a bal oldali operandusnak (\texttt{LHS}) \textbf{kötelezően} az osztály típusának kell lennie.
+    \item \textbf{A hívás mechanizmusa:} A fordító a \texttt{obj + 10} kifejezést \texttt{obj.operator+(10)} formára fordítja.
+    \item \textbf{A hiba:} Ha megfordítjuk a sorrendet (\texttt{10 + obj}), a fordító a \texttt{10.operator+(obj)} hívást keresné. Mivel az \texttt{int} egy beépített primitív típus, nem rendelkezik tagfüggvényekkel, így ez fordítási hibát okoz.
+    \item \textbf{Következtetés:} Tagfüggvényként csak akkor működne a művelet, ha az osztályunk a bal oldalon áll.
+\end{itemize}
+
+\subsection{A megoldás: Globális (Barát) függvény}
+A teljes kommutativitás eléréséhez az operátort az osztályon kívül, globális függvényként kell definiálni.
+
+\begin{itemize}
+    \item \textbf{Szimmetria:} Globális függvény esetén mindkét operandus egyenrangú paraméterként jelenik meg: \texttt{operator+(LHS, RHS)}.
+    \item \textbf{Implicit konverzió:} Ha az operátor mindkét paramétere az osztály típusát várja, és az osztály rendelkezik megfelelő (nem \texttt{explicit}) konstruktorral, a fordító képes a primitív típust (pl. \texttt{int}) automatikusan átalakítani objektummá.
+    \item \textbf{Eredmény:} Így mind a \texttt{obj + 10}, mind a \texttt{10 + obj} működni fog.
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa egy \texttt{Number} osztályt mutat be, amely összeadható \texttt{int}-tel mindkét irányból.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Number {
+    int value;
+public:
+    // Konstruktor (implicit konverziót engedélyez int-ből)
+    Number(int v) : value(v) {}
+
+    int getValue() const { return value; }
+
+    // HIBÁS MEGKÖZELÍTÉS (Tagfüggvény):
+    // Number operator+(const Number& other) const { ... }
+    // Ez csak a (Number + int) esetet fedné le, az (int + Number)-t NEM.
+
+    // HELYES MEGKÖZELÍTÉS (Globális Barát):
+    friend Number operator+(const Number& lhs, const Number& rhs);
+};
+
+// Globális operátor definíció
+// Mivel mindkét paraméter Number típusú, a fordító
+// implicit konverziót végez, ha int-et lát bármelyik oldalon.
+Number operator+(const Number& lhs, const Number& rhs) {
+    return Number(lhs.value + rhs.value);
+}
+
+int main() {
+    Number n(5);
+
+    // 1. eset: Objektum + int
+    // A fordító átalakítja: operator+(n, Number(10))
+    Number res1 = n + 10; 
+
+    // 2. eset: int + Objektum (Kommutativitás)
+    // A fordító átalakítja: operator+(Number(10), n)
+    // Ez tagfüggvénnyel lehetetlen lenne!
+    Number res2 = 10 + n; 
+
+    std::cout << res1.getValue() << " " << res2.getValue() << std::endl;
+    return 0;
+}
+\end{minted}

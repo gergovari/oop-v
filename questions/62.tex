@@ -1,0 +1,96 @@
+\section{Ismertesse a Zadeh szerinti „s-norma”, „t-norma” és komplemens képzését fuzzy halmazoknál!}
+
+A fuzzy logikában a hagyományos halmazműveletek (komplemens, metszet, unió) általánosításra kerülnek, hogy értelmezhetők legyenek a $[0, 1]$ intervallumon mozgó tagsági értékekre. Lotfi A. Zadeh eredeti definíciói alkotják a „standard” fuzzy műveleteket.
+
+\subsection{1. Fuzzy Komplemens (Tagadás)}
+
+A klasszikus logikai „NEM” ($\neg$) művelet kiterjesztése. Zadeh az úgynevezett \textbf{standard komplemenst} vezette be.
+
+\begin{itemize}
+    \item \textbf{Jelölése:} $\overline{A}$ vagy $\neg A$.
+    \item \textbf{Működési elv:} Minél inkább tagja egy elem a halmaznak, annál kevésbé tagja a komplemensének (szimmetria a 0.5 értékre).
+    \item \textbf{Képlet:}
+    $$ \mu_{\overline{A}}(x) = 1 - \mu_A(x) $$
+    \item \textbf{Axiómák (követelmények):}
+        \begin{itemize}
+            \item \textit{Peremfeltételek:} $c(0)=1$ és $c(1)=0$.
+            \item \textit{Monotonitás:} Ha $\mu_A(x)$ nő, a komplemens csökken.
+            \item \textit{Involúció:} A tagadás tagadása az eredeti érték ($\neg(\neg x) = x$).
+        \end{itemize}
+\end{itemize}
+
+\subsection{2. T-norma (Fuzzy Metszet / ÉS)}
+
+A „t-norma” (Triangular norm) a klasszikus „ÉS” (metszet, $\cap$) művelet általánosított, axiomatikus leírása.
+
+\begin{itemize}
+    \item \textbf{Zadeh definíciója (Standard metszet):}
+        Zadeh a \textbf{MINIMUM} operátort javasolta a fuzzy metszet képzésére.
+        $$ \mu_{A \cap B}(x) = \min(\mu_A(x), \mu_B(x)) $$
+        Ez a létező legnagyobb (legszigorúbb) t-norma.
+        
+    \item \textbf{Szemléletes jelentése:} Egy lánc olyan erős, mint a leggyengébb láncszeme. Ha két feltételnek egyszerre kell teljesülnie, az eredő igazságértéket a kevésbé teljesülő határozza meg.
+    
+    \item \textbf{Általános T-norma axiómák:}
+        Egy $T(x, y): [0,1]^2 \rightarrow [0,1]$ függvény t-norma, ha:
+        \begin{itemize}
+            \item \textit{Kommutatív:} $T(a, b) = T(b, a)$
+            \item \textit{Asszociatív:} $T(a, T(b, c)) = T(T(a, b), c)$
+            \item \textit{Monoton növekvő:} Ha a bemenetek nőnek, az eredmény nem csökkenhet.
+            \item \textit{Peremfeltétel (1 az egységelem):} $T(a, 1) = a$
+        \end{itemize}
+\end{itemize}
+
+\subsection{3. S-norma (Fuzzy Unió / VAGY)}
+
+Az „s-norma” (Triangular conorm / T-conorm) a klasszikus „VAGY” (unió, $\cup$) művelet általánosítása.
+
+\begin{itemize}
+    \item \textbf{Zadeh definíciója (Standard unió):}
+        Zadeh a \textbf{MAXIMUM} operátort javasolta a fuzzy unió képzésére.
+        $$ \mu_{A \cup B}(x) = \max(\mu_A(x), \mu_B(x)) $$
+        Ez a létező legkisebb s-norma.
+
+    \item \textbf{Szemléletes jelentése:} Ha két feltétel közül elég az egyiknek teljesülnie, az eredő igazságértéket a jobban teljesülő határozza meg.
+
+    \item \textbf{Általános S-norma axiómák:}
+        Egy $S(x, y)$ függvény s-norma, ha kommutatív, asszociatív, monoton, és:
+        \begin{itemize}
+            \item \textit{Peremfeltétel (0 az egységelem):} $S(a, 0) = a$
+        \end{itemize}
+\end{itemize}
+
+\subsection{Összefüggés: De Morgan azonosságok}
+
+A Zadeh-féle operátorok (Min, Max, $1-x$) konzisztensek egymással, azaz teljesítik a De Morgan törvényeket, ahogy a klasszikus logika is:
+
+$$ \neg(A \cap B) = \neg A \cup \neg B $$
+$$ 1 - \min(a, b) = \max(1-a, 1-b) $$
+
+\subsection{Implementációs példa}
+
+Az alábbi kód bemutatja a Zadeh-féle operátorok működését:
+
+\begin{minted}{python}
+def fuzzy_operations_zadeh(mu_A, mu_B):
+    # 1. Komplemens (NOT)
+    not_A = 1.0 - mu_A
+    
+    # 2. T-norma (Metszet / AND) -> MINIMUM
+    intersection = min(mu_A, mu_B)
+    
+    # 3. S-norma (Unió / OR) -> MAXIMUM
+    union = max(mu_A, mu_B)
+    
+    return not_A, intersection, union
+
+# Példa értékek
+a = 0.7
+b = 0.4
+
+res = fuzzy_operations_zadeh(a, b)
+# Eredmény:
+# NOT A: 0.3
+# AND:   0.4 (mert 0.4 < 0.7)
+# OR:    0.7 (mert 0.7 > 0.4)
+\end{minted}

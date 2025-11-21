@@ -1,0 +1,95 @@
+\section{Ismertesse a map, multimap STL tárolók tulajdonságait (memória modell, bejárás, bővíthetőség)!}
+
+Az \texttt{std::map} és \texttt{std::multimap} a C++ STL asszociatív tárolói, amelyek \textbf{kulcs-érték párokat} (Key-Value pairs) tárolnak.
+\begin{itemize}
+    \item \textbf{std::map:} Minden kulcs egyedi (egy kulcshoz egy érték tartozik). Gyakran hívják asszociatív tömbnek vagy szótárnak.
+    \item \textbf{std::multimap:} Egy kulcshoz több érték is tartozhat (duplikált kulcsok engedélyezettek).
+\end{itemize}
+
+\subsection{Memória modell (Fa szerkezet)}
+
+Hasonlóan a \texttt{set}-hez, a háttérben itt is egy kiegyensúlyozott bináris keresőfa, jellemzően \textbf{Piros-Fekete fa (Red-Black Tree)} áll.
+
+\begin{itemize}
+    \item \textbf{Elemek szerkezete:} Minden csomópont egy \texttt{std::pair<const Key, T>} objektumot tárol.
+        \begin{itemize}
+            \item \textbf{Key (Kulcs):} Konstans, nem módosítható (mivel ez határozza meg a helyét a fában).
+            \item \textbf{Value (Érték):} Módosítható adattag.
+        \end{itemize}
+    \item \textbf{Elhelyezkedés:} A csomópontok a memóriában szétszórva, dinamikusan foglalódnak le, pointerek kötik össze őket.
+    \item \textbf{Rendezés:} A tároló az elemeket a \textbf{kulcsok} szerint automatikusan rendezve tartja.
+\end{itemize}
+
+
+
+\subsection{Bővíthetőség és Műveletek}
+
+A műveletek sebességét a fa magassága határozza meg.
+
+\begin{itemize}
+    \item \textbf{Logaritmikus idő ($O(\log N)$):} Beszúrás, törlés és keresés (kulcs alapján).
+    \item \textbf{Indexelő operátor (\texttt{[]}) - Csak \texttt{map}:}
+        \begin{itemize}
+            \item \texttt{map[kulcs] = ertek;} formában használható.
+            \item \textbf{Fontos mellékhatás:} Ha a kulcs még nem létezik, \textbf{létrehozza} azt az alapértelmezett értékkel, majd visszaadja a referenciáját. Ha csak keresni akarunk, használjuk a \texttt{find()}-ot vagy \texttt{at()}-et!
+            \item A \texttt{multimap} nem támogatja a \texttt{[]} operátort, mivel egy kulcshoz több érték is tartozhatna.
+        \end{itemize}
+    \item \textbf{Iterátor érvényesség:} Stabil. Elem beszúrása vagy törlése nem érvényteleníti a többi elemre mutató iterátorokat.
+\end{itemize}
+
+\subsection{Bejárás}
+
+\begin{itemize}
+    \item \textbf{Rendezett sorrend:} Az iterátorok a kulcsok növekvő sorrendjében járják be a párokat.
+    \item \textbf{Hozzáférés:} Az iterátor egy \texttt{pair}-re mutat:
+        \begin{itemize}
+            \item \texttt{it->first}: A kulcs (const).
+            \item \texttt{it->second}: Az érték (módosítható).
+        \end{itemize}
+    \item \textbf{Multimap tartomány:} A \texttt{multimap}-ben az azonos kulcsú elemek egymás után helyezkednek el. Ezeket az \texttt{equal\_range()} függvénnyel lehet egyben lekérdezni.
+\end{itemize}
+
+\subsection{Példa a használatra}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <map>
+#include <string>
+
+int main() {
+    // 1. Map létrehozása (Kulcs: string, Érték: int)
+    std::map<std::string, int> eletkorok;
+
+    // 2. Beszúrás indexelő operátorral (csak map)
+    eletkorok["Anna"] = 25; // Létrehozás
+    eletkorok["Bela"] = 30;
+    eletkorok["Anna"] = 26; // Módosítás (felülírás)
+
+    // Beszúrás insert metódussal (párként)
+    eletkorok.insert(std::make_pair("Cecil", 40));
+
+    // 3. Keresés
+    // A [] operátor létrehozná, ha nincs, ezért find-ot használunk ellenőrzésre
+    auto it = eletkorok.find("Bela");
+    if (it != eletkorok.end()) {
+        std::cout << "Bela kora: " << it->second << std::endl;
+        it->second = 31; // Érték módosítható
+        // it->first = "Geza"; // HIBA! Kulcs nem módosítható
+    }
+
+    // 4. Bejárás (Rendezett: Anna -> Bela -> Cecil)
+    std::cout << "Névsor:" << std::endl;
+    for (const auto& par : eletkorok) {
+        std::cout << par.first << ": " << par.second << std::endl;
+    }
+
+    // 5. Multimap példa
+    std::multimap<std::string, int> osztalyzatok;
+    osztalyzatok.insert({"Matek", 5});
+    osztalyzatok.insert({"Matek", 4}); // Engedi a duplikált kulcsot
+    
+    std::cout << "Matek jegyek szama: " << osztalyzatok.count("Matek") << std::endl; // 2
+
+    return 0;
+}
+\end{minted}

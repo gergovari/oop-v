@@ -1,0 +1,93 @@
+\section{Ismertesse az I/O operátorok túlterhelésének szabályait! Írjon példát osztálypéldány kiíratásához!}
+
+A C++ nyelvben a saját típusok (osztályok) és a \texttt{iostream} könyvtár (pl. \texttt{std::cout}, \texttt{std::cin}) közötti kommunikációt a biteltoló operátorok (\texttt{<<} és \texttt{>>}) túlterhelésével valósítjuk meg.
+
+\subsection{Alapvető szabályok és elhelyezkedés}
+
+Az I/O operátorok túlterhelése eltér a legtöbb operátorétól az operandusok sorrendje miatt.
+
+\begin{itemize}
+    \item \textbf{Globális függvényként kell definiálni:}
+        \begin{itemize}
+            \item Nem lehetnek az osztály tagfüggvényei.
+            \item \textit{Indoklás:} A bináris operátoroknál a bal oldali operandus határozza meg a hívást. Kiíratásnál (\texttt{std::cout << obj}) a bal oldali operandus az \texttt{ostream} típusú objektum, melynek forráskódja (az STL része) nem módosítható.
+        \end{itemize}
+    \item \textbf{Láncolhatóság (Chaining):}
+        \begin{itemize}
+            \item A visszatérési értéknek mindig a kapott stream referenciájának kell lennie.
+            \item Ez teszi lehetővé a műveletek fűzését: \texttt{cout << a << b << c;}.
+        \end{itemize}
+\end{itemize}
+
+\subsection{A függvények szignatúrája}
+
+A szabványos I/O működéshez az alábbi paraméterezést kell követni:
+
+\begin{itemize}
+    \item \textbf{Kimenet (Insertion operator \texttt{<<}):}
+        \begin{itemize}
+            \item \textbf{Bal operandus:} \texttt{std::ostream\&} (nem konstans, mert íráskor változik a belső állapota).
+            \item \textbf{Jobb operandus:} \texttt{const T\&} (az osztályunk példánya; konstans referenciaként adjuk át a hatékonyság és adatvédelem miatt).
+            \item \textbf{Visszatérés:} \texttt{std::ostream\&}.
+        \end{itemize}
+    \item \textbf{Bemenet (Extraction operator \texttt{>>}):}
+        \begin{itemize}
+            \item \textbf{Bal operandus:} \texttt{std::istream\&}.
+            \item \textbf{Jobb operandus:} \texttt{T\&} (sima referencia, mivel a függvénynek módosítania kell az objektumot a beolvasott adatokkal).
+            \item \textbf{Visszatérés:} \texttt{std::istream\&}.
+        \end{itemize}
+\end{itemize}
+
+\subsection{A „friend” mechanizmus szerepe}
+
+Mivel ezek globális (stand-alone) függvények, alapértelmezésben csak a publikus metódusokat érik el.
+\begin{itemize}
+    \item Ha a kiíratás/beolvasás \texttt{private} adattagokat érint, a függvényt \textbf{friend}-ként (barátként) kell deklarálni az osztály belsejében.
+    \item Ha léteznek megfelelő \texttt{public} getter/setter metódusok, a friend deklaráció elhagyható (de ez ritkább megoldás).
+\end{itemize}
+
+\subsection{Példa: Komplex szám osztály kiíratása}
+
+Az alábbi példa bemutatja a deklarációt és az implementációt egy \texttt{Complex} osztály esetén.
+
+\begin{minted}{cpp}
+#include <iostream>
+
+class Complex {
+private:
+    double real;
+    double imag;
+
+public:
+    Complex(double r = 0, double i = 0) : real(r), imag(i) {}
+
+    // Friend deklaráció az osztályban (a private tagok eléréséhez)
+    // Figyelem: ez nem tagfüggvény, csak itt engedélyezzük a hozzáférést
+    friend std::ostream& operator<<(std::ostream& os, const Complex& c);
+};
+
+// Implementáció (osztályon kívül)
+// Paraméterek:
+// 1. os: a kimeneti adatfolyam (pl. cout)
+// 2. c: a kiírandó objektum
+std::ostream& operator<<(std::ostream& os, const Complex& c) {
+    // Formázott kiíratás
+    os << c.real;
+    if (c.imag >= 0) os << "+";
+    os << c.imag << "i";
+    
+    // Fontos: a stream referenciájának visszaadása a láncoláshoz
+    return os;
+}
+
+int main() {
+    Complex c1(3.5, -2.0);
+    Complex c2(1.0, 4.0);
+    
+    // Használat láncolva
+    // (operator<<(std::cout, c1)) hívódik először, majd az eredményen a c2
+    std::cout << "Szamok: " << c1 << " es " << c2 << std::endl;
+    
+    return 0;
+}
+\end{minted}

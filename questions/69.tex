@@ -1,0 +1,87 @@
+\section{Ismertesse az OWA operátort!}
+
+Az OWA (Ordered Weighted Averaging – Rendezett Súlyozott Átlag) operátort Ronald R. Yager vezette be 1988-ban. Ez egy olyan aggregációs művelet, amely hidat képez a \textbf{Minimum} (ÉS jellegű) és a \textbf{Maximum} (VAGY jellegű) operátorok között, lehetővé téve a „szigorúság” finomhangolását.
+
+\subsection{Definíció}
+
+Az OWA operátor egy $F: \pmb{R}^n \to \pmb{R}$ leképezés, amelyhez tartozik egy $W = [w_1, w_2, \dots, w_n]$ súlyvektor, ahol:
+\begin{enumerate}
+    \item $w_i \in [0, 1]$
+    \item $\sum_{i=1}^{n} w_i = 1$
+\end{enumerate}
+
+A függvény értéke:
+$$ F(a_1, a_2, \dots, a_n) = \sum_{j=1}^{n} w_j b_j $$
+
+Ahol $b_j$ az input argumentumok ($a_1, \dots, a_n$) \textbf{csökkenő sorrendbe rendezett} permutációjának $j$-edik eleme.
+$$ b_1 \ge b_2 \ge \dots \ge b_n $$
+
+\subsection{A legfontosabb különbség a Súlyozott Átlaghoz képest}
+
+A hagyományos súlyozott átlagnál ($WA$) a súlyok a konkrét \textit{adatforráshoz} (attribútumhoz) tartoznak. Az OWA operátornál a súlyok a \textbf{pozícióhoz (rangsorhoz)} tartoznak.
+
+\begin{itemize}
+    \item \textbf{WA:} A $w_1$ súly mindig az $a_1$ bemenetet szorozza, függetlenül annak értékétől.
+    \item \textbf{OWA:} A $w_1$ súly mindig a \textbf{legnagyobb} bemeneti értéket szorozza, a $w_2$ a második legnagyobbat, és így tovább.
+\end{itemize}
+
+\subsection{Speciális esetek (A súlyvektor függvényében)}
+
+A súlyvektor beállításával az operátor viselkedése változik a két szélsőség között:
+
+\begin{itemize}
+    \item \textbf{Maximum (VAGY):} $W^* = [1, 0, \dots, 0]$
+        \begin{itemize}
+            \item Csak a legnagyobb elemet veszi figyelembe.
+        \end{itemize}
+    \item \textbf{Minimum (ÉS):} $W_* = [0, 0, \dots, 1]$
+        \begin{itemize}
+            \item Csak a legkisebb elemet veszi figyelembe.
+        \end{itemize}
+    \item \textbf{Számtani közép:} $W_{avg} = [\frac{1}{n}, \frac{1}{n}, \dots, \frac{1}{n}]$
+        \begin{itemize}
+            \item Minden elemet egyformán súlyoz.
+        \end{itemize}
+    \item \textbf{Olimpiai átlag:} A szélsőértékek kizárása (pl. az első és utolsó súly 0, a többi egyenlő).
+\end{itemize}
+
+\subsection{Jellemzők: Orness és Diszperzió}
+
+Az operátor karakterisztikáját két mérőszámmal írhatjuk le:
+
+\begin{enumerate}
+    \item \textbf{Orness (VAGY-szerűség):} Azt méri, mennyire hasonlít az operátor a Maximumhoz (optimista viselkedés).
+        \begin{itemize}
+            \item Ha a súlyok az indexek elején tömörülnek $\rightarrow$ Magas Orness.
+            \item Ha a súlyok az indexek végén tömörülnek $\rightarrow$ Alacsony Orness (ÉS-szerű).
+        \end{itemize}
+    \item \textbf{Diszperzió (Entrópia):} Azt méri, mennyire használja ki az összes információt.
+        \begin{itemize}
+            \item Ha $W = [\frac{1}{n}, \dots]$, a diszperzió maximális.
+            \item Ha $W = [1, 0, \dots]$, a diszperzió 0.
+        \end{itemize}
+\end{enumerate}
+
+\subsection{Számítási Példa}
+
+Legyenek a bemeneti értékek (pl. három bíráló pontszáma): $A = [0.4, \mathbf{0.9}, 0.7]$.
+Legyen a súlyvektor (optimista hozzáállás): $W = [0.6, 0.3, 0.1]$.
+
+\begin{minted}{python}
+# 1. Bemenetek
+inputs = [0.4, 0.9, 0.7]
+
+# 2. RENDEZÉS (Ez a kritikus lépés!)
+# Csökkenő sorrendbe állítjuk az értékeket:
+sorted_inputs = [0.9, 0.7, 0.4] 
+# (b1=0.9, b2=0.7, b3=0.4)
+
+# 3. Súlyozott összegzés
+# w1*b1 + w2*b2 + w3*b3
+result = (0.6 * 0.9) + (0.3 * 0.7) + (0.1 * 0.4)
+
+# Számítás: 0.54 + 0.21 + 0.04
+# OWA Eredmény = 0.79
+\end{minted}
+
+Látható, hogy az eredmény (0.79) magasabb, mint a számtani átlag ($\approx 0.66$), mert a legnagyobb érték kapta a legnagyobb súlyt.

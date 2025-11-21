@@ -1,0 +1,85 @@
+\section{Ismertesse az STL tárolókon végrehajtható algoritmusok működését és testre szabási lehetőségeiket!}
+
+Az STL (Standard Template Library) algoritmusai olyan generikus (típusfüggetlen) függvények, amelyek a tárolók elemein végeznek műveleteket (keresés, rendezés, számlálás, módosítás). A definíciók a \texttt{<algorithm>} és \texttt{<numeric>} header fájlokban találhatók.
+
+\subsection{Működési elv: Az iterátorok szerepe}
+
+Az algoritmusok legfontosabb tulajdonsága, hogy \textbf{nem ismerik a tárolót}, amin dolgoznak.
+
+\begin{itemize}
+    \item \textbf{Elválasztás:} Az algoritmusok és a tárolók egymástól függetlenek. A kapcsolatot az \textbf{iterátorok} teremtik meg.
+    \item \textbf{Tartomány (Range):} Az algoritmusok mindig egy \texttt{[begin, end)} intervallumon dolgoznak. A kezdő iterátor benne van a tartományban, a végzáró iterátor az utolsó elem \textit{után} mutat.
+    \item \textbf{Generikusság:} Mivel template-ek, bármilyen objektummal működnek, aminek van megfelelő iterátora (akár hagyományos C-tömbökkel is).
+    \item \textbf{Korlátok:} Mivel nem érik el magát a tároló objektumot (csak az elemeit), az algoritmusok \textbf{nem tudják megváltoztatni a tároló méretét} (nem tudnak törölni vagy beszúrni, csak felülírni/cserélni), kivéve speciális \textit{inserter} iterátorok használatával.
+\end{itemize}
+
+\subsection{Algoritmus típusok}
+
+\begin{enumerate}
+    \item \textbf{Nem módosító (Non-modifying):} Pl. \texttt{find}, \texttt{count}, \texttt{for\_each}. Csak olvassák az elemeket.
+    \item \textbf{Módosító (Modifying):} Pl. \texttt{copy}, \texttt{replace}, \texttt{transform}. Megváltoztatják az elemek értékét vagy sorrendjét.
+    \item \textbf{Rendezés és Halmazműveletek:} Pl. \texttt{sort}, \texttt{binary\_search}, \texttt{merge}.
+    \item \textbf{Numerikus:} Pl. \texttt{accumulate} (összegzés).
+\end{enumerate}
+
+\subsection{Testre szabás (Customization)}
+
+Az algoritmusok viselkedése paraméterezhető saját logikával. Ezt úgy érjük el, hogy az adatok mellé átadunk egy függvényt vagy objektumot is.
+
+\begin{itemize}
+    \item \textbf{Predikátumok (Predicates):}
+        Olyan függvények, amelyek \texttt{bool} (igaz/hamis) értékkel térnek vissza. Az algoritmus ezt használja döntéshozatalra (pl. "ez az elem megfelel-e a feltételnek?").
+        \begin{itemize}
+            \item \textbf{Unáris:} Egy paramétert vár (pl. \texttt{find\_if}).
+            \item \textbf{Bináris:} Két paramétert vár (pl. rendezésnél összehasonlítás).
+        \end{itemize}
+    \item \textbf{Megvalósítási formák:}
+        \begin{enumerate}
+            \item \textbf{Függvény pointer:} Hagyományos C-stílusú függvény címe.
+            \item \textbf{Funktor (Function Object):} Olyan osztály, amely túlterheli az \texttt{operator()}-t. Állapotot is tud tárolni.
+            \item \textbf{Lambda kifejezés (C++11):} Helyben definiált, névtelen függvény. Ez a modern és leggyakoribb megoldás.
+        \end{enumerate}
+\end{itemize}
+
+\subsection{Példa: Rendezés és Keresés testre szabása}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <vector>
+#include <algorithm> // Algoritmusok
+#include <numeric>   // accumulate
+
+int main() {
+    std::vector<int> v = {10, 5, 8, 20, 3};
+
+    // 1. Alapértelmezett működés: Növekvő rendezés
+    // Csak a tartományt adjuk át
+    std::sort(v.begin(), v.end()); 
+    // v: 3, 5, 8, 10, 20
+
+    // 2. Testre szabás Lambda kifejezéssel: Csökkenő rendezés
+    // A 3. paraméter egy bináris predikátum (komparátor)
+    std::sort(v.begin(), v.end(), [](int a, int b) {
+        return a > b; // Ha 'a' nagyobb, kerüljön előre
+    });
+    // v: 20, 10, 8, 5, 3
+
+    // 3. Feltételes keresés (find_if)
+    // Keressük meg az első 6-nál nagyobb páros számot
+    auto it = std::find_if(v.begin(), v.end(), [](int n) {
+        return (n > 6) && (n % 2 == 0);
+    });
+
+    if (it != v.end()) {
+        std::cout << "Talalat: " << *it << std::endl; // 20 vagy 10 vagy 8 (sorrendtől függ)
+    }
+
+    // 4. Művelet minden elemen (for_each)
+    // Referenciát kap, így módosítani is tud
+    std::for_each(v.begin(), v.end(), [](int& n) {
+        n *= 2; // Minden elemet megduplázunk
+    });
+
+    return 0;
+}
+\end{minted}

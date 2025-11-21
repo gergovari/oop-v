@@ -1,0 +1,48 @@
+\section{Ismertesse ábrával a „mag”, „tartó”, „$\alpha$ vágat”, „szigorú $\alpha$ vágat” és „magasság” fogalmakat a fuzzy halmazok esetén!}
+
+A fuzzy halmazok jellemzésére és a hagyományos (crisp) halmazokkal való összekapcsolására speciális fogalmakat használunk. Ezek a fogalmak a tagsági függvény ($\mu_A(x)$) különböző tulajdonságait írják le.
+
+\subsection{Szemléltető Ábra}
+
+Az alábbi ábra egy trapéz alakú fuzzy halmazon mutatja be a definíciókat.
+
+\begin{center}
+    \begin{figure}[hbt!]
+		\centering
+		\includegraphics[scale=.3]{./images/fuzzy.jpg}
+		\caption{Fuzzy halmaz jellemzői: magasság, tartó, mag, $\alpha$-vágat és szigorú $\alpha$-vágat}
+	\end{figure}
+\end{center}
+
+\subsection{Definíciók}
+
+Legyen $X$ az alaphalmaz (univerzum) és $A$ egy ezen értelmezett fuzzy halmaz.
+
+\begin{itemize}
+    \item \textbf{Magasság (Height):}
+        A tagsági függvény által felvett legnagyobb érték (szuprémum).
+        $$ \text{hgt}(A) = \sup_{x \in X} \mu_A(x) $$
+        \begin{itemize}
+            \item Ha $\text{hgt}(A) = 1$, a fuzzy halmazt \textbf{normálnak} nevezzük.
+            \item Ha $\text{hgt}(A) < 1$, a fuzzy halmaz \textbf{szubnormál}.
+        \end{itemize}
+
+    \item \textbf{Tartó (Support):}
+        Az alaphalmaz azon elemeinek halmaza (hagyományos halmaz), amelyek tagsági foka \textit{nagyobb, mint nulla}.
+        $$ \text{supp}(A) = \{ x \in X \mid \mu_A(x) > 0 \} $$
+        Gyakorlatilag ez a fuzzy halmaz "szélessége" az alján.
+
+    \item \textbf{Mag (Core):}
+        Az alaphalmaz azon elemeinek halmaza, amelyek \textit{teljes mértékben} (1-es értékkel) tartoznak a fuzzy halmazhoz.
+        $$ \text{core}(A) = \{ x \in X \mid \mu_A(x) = 1 \} $$
+        
+    \item \textbf{$\alpha$-vágat ($\alpha$-cut):}
+        Egy $\alpha \in [0, 1]$ szinten vett vízszintes metszet. Az eredmény egy olyan hagyományos halmaz, amely tartalmazza mindazon elemeket, amelyek tagsági foka eléri vagy meghaladja az $\alpha$ szintet.
+        $$ A_\alpha = \{ x \in X \mid \mu_A(x) \geq \alpha \} $$
+        \textit{Megjegyzés:} A mag nem más, mint az $1$-vágat ($A_1$).
+
+    \item \textbf{Szigorú $\alpha$-vágat (Strong $\alpha$-cut):}
+        Hasonló a sima vágathoz, de itt szigorú egyenlőtlenséget használunk (az éppen $\alpha$ értékű elemek nem kerülnek bele).
+        $$ A_{\bar{\alpha}} = \{ x \in X \mid \mu_A(x) > \alpha \} $$
+        \textit{Megjegyzés:} A tartó nem más, mint a szigorú $0$-vágat ($A_{\bar{0}}$).
+\end{itemize}

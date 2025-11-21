@@ -1,0 +1,61 @@
+\section{Ismertesse a fuzzy rendszerek általános blokkvázlatát!}
+
+A fuzzy következtető rendszerek (Fuzzy Inference System – FIS) célja, hogy éles (crisp) mérési adatokból nyelvi szabályok alapján éles beavatkozó jelet állítsanak elő. A rendszer négy fő komponensből épül fel.
+
+\subsection{A rendszer felépítése (Strukturális ábra)}
+
+A fuzzy vezérlő adatfolyam-modellje az alábbiak szerint írható le:
+
+\begin{verbatim}
++-------------+      +----------------+      +----------------+      +-------------+
+|    Éles     | ---> |  Fuzzifikáló   | ---> |  Következtető  | ---> | Defuzzifikáló| ---> Éles
+|   Bemenet   |      |    Egység      |      |     Motor      |      |    Egység    |      Kimenet
++-------------+      +----------------+      +-------+--------+      +-------------+
+                                                     |
+                                                     v
+                                             +----------------+
+                                             |   Tudásbázis   |
+                                             | (Szabálybázis) |
+                                             +----------------+
+\end{verbatim}
+
+\subsection{1. Fuzzifikáló egység (Fuzzification Interface)}
+
+Ez a modul végzi az átjárást a fizikai világ és a fuzzy logika között.
+\begin{itemize}
+    \item \textbf{Feladata:} A bemenetről érkező konkrét számértéket (pl. $25^\circ\text{C}$) átalakítja nyelvi értékekhez tartozó tagsági fokokká.
+    \item \textbf{Működése:} A bemeneti tagsági függvényekre (pl. "Hideg", "Meleg") vetíti a bemeneti jelet.
+    \item \textbf{Eredménye:} Fuzzy halmazok (tagsági értékek halmaza a $[0, 1]$ intervallumon).
+\end{itemize}
+
+\subsection{2. Tudásbázis (Knowledge Base)}
+
+A rendszer "agya", amely az alkalmazásspecifikus ismereteket tárolja. Két részből áll:
+\begin{itemize}
+    \item \textbf{Adatbázis (Database):} Tartalmazza a használt nyelvi változók definícióit és a tagsági függvények paramétereit (formáját, elhelyezkedését).
+    \item \textbf{Szabálybázis (Rule Base):} A szakértői tudást leíró IF-THEN (Ha... akkor...) szabályok gyűjteménye.
+        \begin{itemize}
+            \item Pl.: \textit{"HA a hőmérséklet magas ÉS a nyomás alacsony, AKKOR a szelep legyen félig nyitva."}
+        \end{itemize}
+\end{itemize}
+
+\subsection{3. Következtető motor (Inference Engine)}
+
+Ez a komponens hajtja végre a fuzzy logikai műveleteket a szabályok alapján.
+\begin{itemize}
+    \item \textbf{Illesztés:} Meghatározza, hogy az aktuális bemenetekre mely szabályok vonatkoznak (firing strength).
+    \item \textbf{Kiértékelés:} A t-normák és s-normák segítségével kombinálja a szabályok feltételeit és levonja a következtetést az egyes szabályokra.
+    \item \textbf{Aggregáció:} Az összes aktív szabály részeredményét (a kimeneti fuzzy halmazokat) egyetlen eredő fuzzy halmazzá egyesíti.
+\end{itemize}
+
+\subsection{4. Defuzzifikáló egység (Defuzzification Interface)}
+
+A fuzzy eredményt visszaalakítja a fizikai világ számára értelmezhető jellé.
+\begin{itemize}
+    \item \textbf{Feladata:} Az aggregált (bonyolult alakú) fuzzy halmazból egyetlen konkrét számértéket (skalárt) állít elő, amely a legjobban reprezentálja a következtetést.
+    \item \textbf{Módszerei:}
+        \begin{itemize}
+            \item \textbf{COG (Center of Gravity):} Súlypontszámítás (a leggyakoribb).
+            \item \textbf{MOM (Mean of Maxima):} A maximumhelyek átlaga.
+        \end{itemize}
+\end{itemize}

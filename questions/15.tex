@@ -1,0 +1,84 @@
+\section{Ismertesse a „const” és „mutable” módosítók működését az osztálytagok definiálásakor!}
+
+\subsection{Áttekintés}
+C++ objektumorientált programozásban a \texttt{const} és \texttt{mutable} kulcsszavak szabályozzák az objektumok állapotának módosíthatóságát, biztosítva a \textit{const-correctness} elvét.
+
+\subsection{A const módosító}
+A \texttt{const} kulcsszó használata biztosítja, hogy az objektum állapota (bizonyos határok között) változatlan maradjon.
+
+\begin{itemize}
+    \item \textbf{Const adattagok (adattag deklaráció):}
+    \begin{itemize}
+        \item Az ilyen változók értéke az inicializálás után nem módosítható.
+        \item Értéket kizárólag a \textbf{konstruktor inicializáló listájában} kaphatnak.
+        \item Nem kaphatnak értéket a konstruktor törzsében (mivel ott már értékadás történne, nem inicializálás).
+    \end{itemize}
+
+    \item \textbf{Const tagfüggvények (metódusok):}
+    \begin{itemize}
+        \item A függvény deklarációjának végére írt \texttt{const} kulcsszó jelzi (pl. \texttt{int get() const;}).
+        \item \textbf{Garancia:} A függvény nem módosítja az objektum egyetlen (nem statikus) adattagját sem.
+        \item \textbf{This pointer:} A függvényen belül a \texttt{this} mutató típusa \texttt{const ClassName* const}-ra változik.
+        \item \textbf{Hívhatóság:} Konstans objektumon (\texttt{const ClassName obj}) kizárólag konstans tagfüggvények hívhatók meg.
+    \end{itemize}
+\end{itemize}
+
+\subsection{A mutable módosító}
+A \texttt{mutable} (változékony) kulcsszó egy explicit kivétel a \texttt{const} szigorúsága alól.
+
+\begin{itemize}
+    \item \textbf{Definíció:} Olyan adattagok előtt használjuk, amelyek akkor is módosíthatók maradnak, ha a tartalmazó objektum példánya \texttt{const}, vagy ha egy \texttt{const} tagfüggvényen belül vagyunk.
+    \item \textbf{Bitonkénti vs. Logikai konstansság:}
+    \begin{itemize}
+        \item A C++ fordító alapértelmezésben \textit{bitonkénti konstansságot} ellenőriz (egyetlen bit sem változhat).
+        \item A \texttt{mutable} lehetővé teszi a \textit{logikai konstansságot}: az objektum külső megfigyelő számára változatlannak tűnik, de belső adminisztrációs adatok változhatnak.
+    \end{itemize}
+    \item \textbf{Gyakori felhasználási esetek:}
+    \begin{itemize}
+        \item \textbf{Mutex-ek (szálbiztonság):} Egy \texttt{std::mutex} zárolása (\texttt{lock}) módosítja a mutex belső állapotát, de ez szükséges olvasási műveleteknél is.
+        \item \textbf{Cache-elés (Memoization):} Egy számításigényes \texttt{get()} függvény eredményének eltárolása az első híváskor, hogy később gyorsabban visszaadható legyen.
+        \item \textbf{Debug számlálók:} Hányszor hívtak meg egy metódust.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja, hogyan módosítható egy \texttt{mutable} változó egy \texttt{const} függvényben a \textit{Lazy Evaluation} (lusta kiértékelés) megvalósításához.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class ComplexCalculation {
+private:
+    int inputValue;
+    
+    // Cache változók: kívülről nem tartoznak az objektum 
+    // "lényegi" állapotához, ezért mutable-k.
+    mutable int cachedResult;
+    mutable bool isCalculated;
+    
+    // Szálbiztonság miatti mutex, mindig mutable
+    mutable std::mutex mtx;
+
+public:
+    ComplexCalculation(int v) 
+        : inputValue(v), cachedResult(0), isCalculated(false) {}
+
+    // A függvény const, tehát elvileg nem írhat adattagot
+    int getResult() const {
+        std::lock_guard<std::mutex> lock(mtx); // Mutex módosul!
+        
+        if (!isCalculated) {
+            // Hosszú számítás szimulálása
+            // A mutable miatt írhatjuk ezeket a tagokat:
+            cachedResult = inputValue * inputValue; 
+            isCalculated = true;
+        }
+        return cachedResult;
+    }
+
+    // Setter: invalidálja a cache-t
+    void setValue(int v) {
+        std::lock_guard<std::mutex> lock(mtx);
+        inputValue = v;
+        isCalculated = false;
+    }
+};
+\end{minted}

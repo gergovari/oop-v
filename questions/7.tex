@@ -1,0 +1,69 @@
+\section{Ismertesse a C++ nyelv memóriafoglalás és felszabadítás operátorait dinamikus példányok létrehozására és megszüntetésére! Írjon példát egy n elemű, double típusú adatokat tartalmazó tömb létrehozására és megszüntetésére!}
+
+\subsection{Az operátorok áttekintése}
+A C++ nyelvben a dinamikus memóriakezelés (Heap/Halom használata) dedikált operátorokkal történik, amelyek típusbiztosak és kezelik az objektumok életciklusát.
+
+\begin{itemize}
+    \item \textbf{\texttt{new} operátor:}
+    \begin{itemize}
+        \item Lefoglalja a megfelelő méretű memóriaterületet a Heap-en.
+        \item \textbf{Meghívja a konstruktort}, így az objektum azonnal inicializálva lesz.
+        \item Visszatér a lefoglalt területre mutató, típushelyes pointerrel.
+        \item Hiba esetén \texttt{std::bad\_alloc} kivételt dob.
+    \end{itemize}
+    
+    \item \textbf{\texttt{delete} operátor:}
+    \begin{itemize}
+        \item \textbf{Meghívja a destruktort}, így az objektum elvégezheti a takarítást (pl. fájlok lezárása).
+        \item Felszabadítja a memóriát és visszaadja az operációs rendszernek.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Skalár vs. Tömbös változatok}
+Szigorú szabály a megfelelő párok használata. A formák keverése definiálatlan viselkedéshez (memóriaszivárgás vagy összeomlás) vezet.
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Használat} & \textbf{Foglalás (Allocation)} & \textbf{Felszabadítás (Deallocation)} \\
+\hline
+Egyetlen objektum & \texttt{new Típus} & \texttt{delete ptr} \\
+\hline
+Tömb (Array) & \texttt{new Típus[méret]} & \texttt{delete[] ptr} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Példa: n elemű double tömb kezelése}
+Az alábbi kódrészlet bemutatja a tömbös szintaxis (\texttt{new[]} és \texttt{delete[]}) helyes alkalmazását.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+void dinamikusTombKezeles() {
+    int n;
+    std::cout << "Kerem a tomb meretet: ";
+    std::cin >> n;
+
+    // 1. LÉTREHOZÁS (Allokáció)
+    // A 'new double[n]' lefoglalja a memóriát n darab double számára.
+    // Visszatérési érték: pointer az első elemre (double*).
+    double* tomb = new double[n];
+
+    // Használat (példa értékadás)
+    for (int i = 0; i < n; ++i) {
+        tomb[i] = static_cast<double>(i) * 1.5;
+    }
+
+    // ... itt használjuk a tömböt ...
+
+    // 2. MEGSZÜNTETÉS (Deallokáció)
+    // FONTOS: Mivel tömböt foglaltunk (new[]), 
+    // kötelező a 'delete[]' (szögletes zárójeles) forma használata!
+    delete[] tomb;
+
+    // Biztonsági lépés: A pointer nullázása, 
+    // hogy ne mutasson felszabadított területre (dangling pointer).
+    tomb = nullptr; 
+}
+\end{minted}

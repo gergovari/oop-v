@@ -1,0 +1,69 @@
+\section{Ismertesse öröklődés során a leszármazottban található konstruktor paraméterezésének és hívásának szabályait, tekintettel az ősben levő privát adattagokra!}
+
+Az objektumorientált programozásban az öröklődés során a származtatott osztály (utód) objektuma magában foglalja az alaposztály (ős) adattagjait is. A helyes inicializálás kulcsa a konstruktorok láncolása.
+
+\subsection{A probléma: Privát adattagok elérése}
+
+\begin{itemize}
+    \item \textbf{Láthatósági korlát:} Az ősosztály \texttt{private} adattagjai fizikailag jelen vannak az utód memóriaképében, de az utódosztály kódjából közvetlenül nem érhetők el (sem olvasásra, sem írásra).
+    \item \textbf{Közvetlen értékadás tilalma:} Az utód konstruktorának törzsében nem írhatjuk le, hogy \texttt{os\_privat\_adat = ertek;}, mert ez hozzáférési hibát (access violation) okoz.
+    \item \textbf{Megoldás:} Az inicializálás felelősségét át kell adni az ősosztálynak, aki hozzáfér a saját privát adataihoz.
+\end{itemize}
+
+\subsection{Konstruktor hívási szabályok}
+
+Az utódosztály konstruktorának „közvetítőként” kell viselkednie:
+
+\begin{itemize}
+    \item \textbf{Taginicializáló lista (Member Initializer List):} Az ős konstruktorát \textbf{kizárólag} az inicializáló listán (a kettőspont után, de a kapcsos zárójel előtt) lehet és kell meghívni.
+    \item \textbf{Paraméterátadás:} Az utód konstruktora paraméterként bekéri az összes adatot (a sajátjaihoz és az őséihez tartozókat is), majd a megfelelőket továbbpasszolja az ős konstruktorának.
+    \item \textbf{Végrehajtási sorrend:}
+        \begin{enumerate}
+            \item Először lefut az \textbf{ős} konstruktora (inicializálja a privát adattagokat).
+            \item Ezután inicializálódnak az \textbf{utód} saját adattagjai.
+            \item Végül lefut az \textbf{utód} konstruktorának törzse.
+        \end{enumerate}
+\end{itemize}
+
+\subsection{Kötelezőség és Default konstruktor}
+
+\begin{itemize}
+    \item \textbf{Ha van Default (paraméter nélküli) konstruktor az ősben:} Nem kötelező explicit módon hívni az őst az inicializáló listán; a fordító automatikusan meghívja a paraméter nélkülit.
+    \item \textbf{Ha NINCS Default konstruktor az ősben:} Az utódnak \textbf{kötelező} explicit módon meghívnia az ős valamelyik paraméteres konstruktorát. Ennek hiányában a kód nem fordul le ("no default constructor available").
+\end{itemize}
+
+\subsection{Példa}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <string>
+
+// Ősosztály
+class Jarmu {
+private:
+    int loero; // Privát: az Auto nem látja közvetlenül!
+
+public:
+    // Paraméteres konstruktor (Nincs default!)
+    Jarmu(int hp) : loero(hp) {
+        std::cout << "Jarmu init: " << loero << " HP" << std::endl;
+    }
+};
+
+// Származtatott osztály
+class Auto : public Jarmu {
+private:
+    std::string marka; // Saját adattag
+
+public:
+    // A konstruktor paraméterben kapja meg a lóerőt (ősnek) és a márkát (magának)
+    Auto(int hp, std::string m) 
+        : Jarmu(hp),  // 1. Továbbítjuk az adatot az ősnek (KÖTELEZŐ itt!)
+          marka(m)    // 2. Inicializáljuk a saját adatot
+    {
+        // 3. Itt a 'loero' már be van állítva, de
+        // loero = 100; // HIBA lenne, mert privát
+        std::cout << "Auto kesz." << std::endl;
+    }
+};
+\end{minted}

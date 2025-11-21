@@ -1,0 +1,85 @@
+\section{Ismertesse a set, multiset STL tárolók tulajdonságait (memória modell, bejárás, bővíthetőség)!}
+
+Az \texttt{std::set} és \texttt{std::multiset} az STL asszociatív tárolói. Fő jellemzőjük, hogy az elemeket nem a beillesztés sorrendjében, hanem az értékük szerinti \textbf{rendezett állapotban} tárolják. A \texttt{set} minden elemből csak egyet tárolhat (egyedi kulcsok), míg a \texttt{multiset} engedélyezi a duplikációkat.
+
+\subsection{Memória modell (Kiegyensúlyozott fa)}
+
+A háttérben nem tömb és nem láncolt lista áll, hanem egy bonyolultabb, csomópont-alapú adatszerkezet.
+
+\begin{itemize}
+    \item \textbf{Adatszerkezet:} Szinte minden implementációban (GCC, MSVC) \textbf{Piros-Fekete fát (Red-Black Tree)} használnak. Ez egy önkiegyensúlyozó bináris keresőfa.
+    \item \textbf{Csomópontok felépítése:} Minden elem külön memóriablokkban helyezkedik el (mint a listánál), amely tartalmazza:
+        \begin{itemize}
+            \item Magát az adatot (értéket).
+            \item Három mutatót: Szülő (Parent), Bal gyerek (Left), Jobb gyerek (Right).
+            \item Egy színt (Piros vagy Fekete) a fa egyensúlyának fenntartásához.
+        \end{itemize}
+    \item \textbf{Memória overhead:} Jelentős, mivel minden adathoz több pointert és adminisztrációs bitet kell tárolni.
+\end{itemize}
+
+
+
+\subsection{Bővíthetőség és Teljesítmény}
+
+Mivel az adatszerkezet mindig rendezett marad, a beszúrás és törlés költségesebb, mint egy listánál, de a keresés sokkal gyorsabb.
+
+\begin{itemize}
+    \item \textbf{Logaritmikus műveletigény ($O(\log N)$):}
+        \begin{itemize}
+            \item Beszúrás (\texttt{insert}): Megkeresi a helyét a fában, majd szükség esetén forgatásokkal kiegyensúlyozza azt.
+            \item Törlés (\texttt{erase}): Szintén logaritmikus.
+            \item Keresés (\texttt{find}): Bináris keresés elvén működik, nagyon gyors.
+        \end{itemize}
+    \item \textbf{Iterátor érvényesség:} Elem beszúrása vagy törlése \textbf{nem érvényteleníti} a többi elemre mutató iterátorokat (mivel a csomópontok címe nem változik a memóriában, csak a pointerek kötődnek át).
+    \item \textbf{Módosíthatatlanság:} A tárolt elemek kulcsai \textbf{konstansok}. Nem módosíthatunk egy elemet közvetlenül a tárolóban (mivel az elrontaná a sorrendet). Módosításhoz törölni kell a régit, és beszúrni az újat.
+\end{itemize}
+
+\subsection{Bejárás és Elérés}
+
+\begin{itemize}
+    \item \textbf{Rendezett bejárás:} Az iterátorok (\texttt{begin()} $\rightarrow$ \texttt{end()}) "In-order" bejárást végeznek, így az elemeket mindig növekvő sorrendben kapjuk vissza.
+    \item \textbf{Típus:} Kétirányú iterátor (Bidirectional Iterator). Csak \texttt{++} és \texttt{--} művelet van, ugrani nem lehet.
+    \item \textbf{Nincs indexelés:} Nem használható a \texttt{[]} operátor vagy az \texttt{at()}, mivel nincs véletlen elérés.
+\end{itemize}
+
+\subsection{Példa a működésre}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <set>
+
+int main() {
+    // 1. Set létrehozása (automatikusan rendezett, egyedi)
+    std::set<int> halmaz;
+
+    // 2. Beszúrás O(log N)
+    halmaz.insert(40);
+    halmaz.insert(10);
+    halmaz.insert(40); // DUPLIKÁCIÓ: A set ezt figyelmen kívül hagyja!
+    halmaz.insert(20);
+
+    // 3. Bejárás (Mindig rendezett sorrendben!)
+    std::cout << "Set elemei: "; 
+    for (int x : halmaz) {
+        std::cout << x << " "; 
+    }
+    // Kimenet: 10 20 40 (Növekvő sorrend, duplikáció nélkül)
+    std::cout << std::endl;
+
+    // 4. Multiset példa
+    std::multiset<int> multi;
+    multi.insert(40);
+    multi.insert(40); // Ez bekerül másodszor is
+    
+    std::cout << "Multiset 40 darabszama: " << multi.count(40) << std::endl; // 2
+
+    // 5. Keresés O(log N)
+    auto it = halmaz.find(20);
+    if (it != halmaz.end()) {
+        std::cout << "Megtalalva: " << *it << std::endl;
+        // *it = 25; // HIBA! Az elemek read-only (const) típusúak
+    }
+
+    return 0;
+}
+\end{minted}

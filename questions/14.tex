@@ -1,0 +1,80 @@
+\section{Ismertesse a „private”, „protected”, „public” módosítók működését az osztálytagok definiálásakor!}
+
+\subsection{A hozzáférési szintek célja}
+A C++ nyelvben a hozzáférési módosítók (access specifiers) szabályozzák az egységbe zárást (encapsulation). Azt határozzák meg, hogy az osztály adattagjaihoz és tagfüggvényeihez a kód mely részeiből lehet hozzáférni.
+
+\subsection{A három módosító részletezése}
+
+\begin{enumerate}
+    \item \textbf{\texttt{public} (Nyilvános):}
+    \begin{itemize}
+        \item \textbf{Láthatóság:} Bárhonnan elérhető (az osztályon belülről, leszármazott osztályokból és a külvilágból, pl. a \texttt{main}-ből is).
+        \item \textbf{Használat:} Az osztály publikus interfésze (azok a függvények, amelyeket a felhasználónak szánunk).
+    \end{itemize}
+
+    \item \textbf{\texttt{protected} (Védett):}
+    \begin{itemize}
+        \item \textbf{Láthatóság:} A külvilág számára rejtett, de az osztály saját metódusai és a \textbf{leszármazott osztályok} (gyerekosztályok) hozzáférhetnek.
+        \item \textbf{Használat:} Olyan segédváltozók vagy függvények, amelyek a belső működéshez kellenek, és szeretnénk megosztani az öröklési hierarchiában.
+    \end{itemize}
+
+    \item \textbf{\texttt{private} (Privát):}
+    \begin{itemize}
+        \item \textbf{Láthatóság:} Kizárólag az adott osztály saját metódusai (és a \texttt{friend} osztályok) láthatják. Még a leszármazottak sem férnek hozzá!
+        \item \textbf{Használat:} Adattagok (belső állapot) védelme. Ez az alapértelmezett láthatóság \texttt{class} esetén.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Összehasonlító táblázat}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Módosító} & \textbf{Saját osztály} & \textbf{Leszármazott} & \textbf{Külvilág (pl. main)} \\
+\hline
+\texttt{public} & IGEN & IGEN & IGEN \\
+\hline
+\texttt{protected} & IGEN & IGEN & \textbf{NEM} \\
+\hline
+\texttt{private} & IGEN & \textbf{NEM} & \textbf{NEM} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Demonstrációs példa}
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class OsOsztaly {
+public:
+    int publikusAdat;    // Mindenki látja
+protected:
+    int vedettAdat;      // Csak a család (leszármazottak) látja
+private:
+    int privatAdat;      // Titok (csak ez az osztály látja)
+
+public:
+    void teszt() {
+        privatAdat = 1;  // OK: Belül vagyunk
+    }
+};
+
+class Leszarmazott : public OsOsztaly {
+public:
+    void hozzaferesTeszt() {
+        publikusAdat = 2; // OK
+        vedettAdat = 3;   // OK: Örököltük, láthatjuk
+        
+        // privatAdat = 4; // -> HIBA: A gyerek sem láthatja a szülő privátját!
+    }
+};
+
+int main() {
+    OsOsztaly obj;
+    
+    obj.publikusAdat = 10; // OK
+    
+    // obj.vedettAdat = 20; // -> HIBA: Kívülről ez olyan, mintha private lenne
+    // obj.privatAdat = 30; // -> HIBA: Nem látható
+    
+    return 0;
+}
+\end{minted}

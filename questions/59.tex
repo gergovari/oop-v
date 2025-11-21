@@ -1,0 +1,82 @@
+\section{Ismertesse a „nyelvi változó”, „karakterisztikus függvény” és a „tagsági függvény” fogalmakat Zadeh szerint!}
+
+Lotfi A. Zadeh 1965-ben publikálta a Fuzzy (elmosódott) halmazok elméletét, amely a kétértékű (bináris) logika kiterjesztése. A tétel a hagyományos halmazelmélet és a fuzzy logika közti matematikai különbségeket, valamint az emberi gondolkodás modellezésének alapjait tárgyalja.
+
+\subsection{1. Karakterisztikus függvény (Hagyományos halmazok)}
+
+A klasszikus (úgynevezett „crisp” vagy éles) halmazelméletben egy elem vagy beletartozik egy halmazba, vagy nem. Nincs átmenet.
+
+\begin{itemize}
+    \item \textbf{Definíció:} Legyen $X$ az alaphalmaz (univerzum) és $A \subseteq X$ egy részhalmaz. Az $A$ halmaz $\chi_A$ karakterisztikus függvénye:
+    $$ \chi_A(x) = \begin{cases} 1, & \text{ha } x \in A \\ 0, & \text{ha } x \notin A \end{cases} $$
+    \item \textbf{Jellemzői:}
+        \begin{itemize}
+            \item \textbf{Értékkészlet:} $\{0, 1\}$.
+            \item \textbf{Jelentése:} Egyértelmű hovatartozás (igaz/hamis).
+            \item \textbf{Korlátja:} Nem képes modellezni a bizonytalan fogalmakat (pl. „magas ember”, „meleg idő”), ahol a határvonal nem éles.
+        \end{itemize}
+\end{itemize}
+
+\subsection{2. Tagsági függvény (Fuzzy halmazok)}
+
+Zadeh felismerése, hogy a valóságban a tulajdonságok fokozatosak. A tagsági függvény (Membership Function) a karakterisztikus függvény általánosítása.
+
+\begin{itemize}
+    \item \textbf{Definíció:} Legyen $X$ az univerzum. Egy $A$ fuzzy halmazt a $\mu_A$ tagsági függvény definiál:
+    $$ \mu_A(x) : X \rightarrow [0, 1] $$
+    \item \textbf{Jellemzői:}
+        \begin{itemize}
+            \item \textbf{Értékkészlet:} A $[0, 1]$ zárt intervallum.
+            \item \textbf{Jelentése:} A $\mu_A(x)$ érték megadja, hogy az $x$ elem \textit{milyen mértékben} tartozik az $A$ halmazhoz (tagsági fok).
+            \item \textbf{Értékek interpretációja:}
+                \begin{itemize}
+                    \item $0$: Egyáltalán nem tagja.
+                    \item $1$: Teljes mértékben tagja.
+                    \item $0 < \mu < 1$: Részleges tagság (átmenet).
+                \end{itemize}
+        \end{itemize}
+    \item \textbf{Típusai:} Háromszög, trapéz, Gauss-görbe (harang) alakú függvények a leggyakoribbak.
+\end{itemize}
+
+\subsection{3. Nyelvi változó (Linguistic Variable)}
+
+A nyelvi változó a fuzzy logika legmagasabb absztrakciós szintje, amely lehetővé teszi a számításokat szavak (nyelvi kifejezések) segítségével, az emberi gondolkodáshoz hasonlóan.
+
+\begin{itemize}
+    \item \textbf{Definíció:} Olyan változó, amelynek értékei nem számok, hanem egy természetes vagy mesterséges nyelv szavai, mondatai.
+    \item \textbf{Példa:}
+        \begin{itemize}
+            \item \textbf{Változó neve:} „Sebesség”
+            \item \textbf{Értékei (Termek):} „Lassú”, „Közepes”, „Gyors”, „Nagyon gyors”.
+        \end{itemize}
+    \item \textbf{Formális definíció (Ötös):} $(x, T(x), U, G, M)$
+        \begin{enumerate}
+            \item $x$: A változó neve (pl. Hőmérséklet).
+            \item $T(x)$: A nyelvi értékek (termek) halmaza (pl. \{Hideg, Langyos, Meleg\}).
+            \item $U$: Az alaphalmaz (univerzum), ahol a fizikai mérés történik (pl. $0..100 ^\circ C$).
+            \item $G$: Szintaktikai szabály (nyelvitan), amely generálja a lehetséges értékeket.
+            \item $M$: Szemantikai szabály, amely minden nyelvi értékhez hozzárendel egy \textit{fuzzy halmazt} (tagsági függvényt) az $U$ univerzumon.
+        \end{enumerate}
+\end{itemize}
+
+\subsection{Összefüggés a fogalmak között}
+
+\begin{minted}{python}
+# Pszeudokód példa a fogalmak kapcsolatára
+
+# 1. Univerzum (U): A fizikai mennyiség (pl. bemeneti hőmérséklet)
+input_homersaklet = 25.5 
+
+# 2. Nyelvi változó: "Hőmérséklet"
+# Nyelvi érték (Term): "Meleg"
+
+# 3. Tagsági függvény (mu_Meleg): A "Meleg" fogalom definíciója
+def membership_meleg(x):
+    if x < 20: return 0.0
+    if x > 30: return 1.0
+    return (x - 20) / 10.0 # Lineáris átmenet (Trapéz/Háromszög széle)
+
+# Eredmény: Tagsági fok (0 és 1 között)
+tagsagi_fok = membership_meleg(input_homersaklet) 
+# tagsagi_fok = 0.55 -> "55%-ban meleg"
+\end{minted}

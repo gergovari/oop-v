@@ -1,0 +1,69 @@
+\section{Ismertesse a „()” operátor túlterhelési lehetőségeit!}
+
+\subsection{Áttekintés és Tulajdonságok}
+A függvényhívás operátor \texttt{operator()} túlterhelésével hozhatjuk létre az úgynevezett \textbf{funktorokat} (function objects). Ez lehetővé teszi, hogy egy objektumpéldányt úgy használjunk, mintha az egy függvény lenne.
+
+\begin{itemize}
+    \item \textbf{Kizárólag tagfüggvényként:} A \texttt{()} operátor csak nem-statikus tagfüggvényként definiálható, globális függvényként nem.
+    \item \textbf{Tetszőleges paraméterszám:} Ez az egyetlen operátor a C++-ban, amely tetszőleges számú ($0, 1, 2, \dots, n$) paramétert fogadhat. Emiatt gyakran használják többdimenziós tömbök (pl. mátrixok) indexelésére, mivel a \texttt{[]} operátor (hagyományosan) csak egy paramétert fogadhat.
+    \item \textbf{Állapotmegőrzés (Stateful):} A hagyományos függvényekkel ellentétben a funktorok rendelkezhetnek belső állapottal (adattagokkal), amelyek megőrződnek a hívások között.
+    \item \textbf{Túlterhelhetőség:} Egy osztályon belül többször is definiálható eltérő paraméterlistával (overloading).
+\end{itemize}
+
+\subsection{Gyakori felhasználási területek}
+\begin{enumerate}
+    \item \textbf{Paraméterezhető műveletek:} Olyan „függvények” létrehozása, amelyek viselkedése konstruktorban állítható be (pl. egy számláló vagy egy küszöbérték-vizsgáló).
+    \item \textbf{STL algoritmusok:} A \texttt{std::sort}, \texttt{std::for\_each} és hasonló algoritmusok gyakran várnak funktorokat predikátumként.
+    \item \textbf{Mátrix-kezelés:} \texttt{matrix(sor, oszlop)} formátumú elérés biztosítása.
+\end{enumerate}
+
+\subsection{Példakód}
+Az alábbi példa egy lineáris transzformációt ($y = ax + b$) megvalósító funktort mutat be, ahol az $a$ és $b$ paraméterek az objektum állapotát képezik.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class LinearTransform {
+private:
+    // Belső állapot (State)
+    double slope;     // a
+    double intercept; // b
+
+public:
+    // Konstruktor: beállítja a működési paramétereket
+    LinearTransform(double a, double b) : slope(a), intercept(b) {}
+
+    // Az operátor túlterhelése
+    // Tetszőleges visszatérési érték és paraméterezés lehetséges
+    double operator()(double x) const {
+        return (slope * x) + intercept;
+    }
+};
+
+class Matrix {
+    int data[10][10];
+public:
+    // Példa több paraméteres használatra (Mátrix indexelés)
+    // A [] operátorral ezt nem lehetne így (több paraméterrel) megoldani.
+    int& operator()(int row, int col) {
+        return data[row][col];
+    }
+};
+
+int main() {
+    // 1. Funktor példányosítása (a=2, b=3)
+    LinearTransform func(2.0, 3.0);
+
+    // 2. Használat függvényhívás szintaxissal
+    // A fordító ezt hívja: func.operator()(5.0)
+    double result = func(5.0); // 2 * 5 + 3 = 13
+
+    std::cout << "Eredmény: " << result << std::endl;
+
+    // 3. Mátrix példa
+    Matrix m;
+    m(1, 2) = 42; // Írás a (1,2) pozícióra
+
+    return 0;
+}
+\end{minted}

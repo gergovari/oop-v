@@ -1,0 +1,44 @@
+\section{Ismertesse példával azt a szituációt, amikor egy fuzzy partíció lefedi az alaphalmazt! Adja meg a szöveges definíciót is!}
+
+A fuzzy rendszerek tervezésekor kritikus szempont, hogy a bemeneti változók teljes tartományát (univerzumát) lefedjük szabályokkal. Ezt biztosítja a helyes fuzzy partíció.
+
+\subsection{Szöveges és Formális Definíció}
+
+Egy adott $X$ alaphalmaz (univerzum) $A_1, A_2, \dots, A_n$ fuzzy halmazai akkor alkotnak **teljes lefedést (partíciót)**, ha az alaphalmaz bármely pontjára igaz, hogy a fuzzy halmazok tagsági értékeinek összege pontosan 1.
+
+Ezt a szakirodalom gyakran **Ruspini-partíciónak** vagy egységfelbontásnak nevezi.
+
+$$ \forall x \in X : \sum_{i=1}^{n} \mu_{A_i}(x) = 1 $$
+
+\textbf{Jelentése a gyakorlatban:}
+\begin{itemize}
+    \item \textbf{Nincs lyuk:} Nincs olyan pontja az alaphalmaznak, amelyre ne lenne értelmezve legalább egy szabály (a rendszer minden bemenetre tud reagálni).
+    \item \textbf{Átmenet:} Ahol az egyik halmaz tagsági értéke csökken, ott egy másiké ugyanolyan mértékben nő.
+\end{itemize}
+
+\subsection{Gyakorlati Példa: Víz hőmérséklet szabályozás}
+
+Tekintsük egy bojler szabályozását, ahol az $X$ alaphalmaz a víz hőmérséklete $0^\circ\text{C}$ és $100^\circ\text{C}$ között.
+
+\begin{itemize}
+    \item \textbf{Univerzum:} $X = [0, 100]$
+    \item \textbf{Nyelvi értékek (Fuzzy halmazok):}
+        \begin{enumerate}
+            \item \textbf{Hideg ($H$):} $0$-nál 1, $50$-nél 0.
+            \item \textbf{Langyos ($L$):} $0$-nál 0, $50$-nél 1, $100$-nál 0.
+            \item \textbf{Forró ($F$):} $50$-nél 0, $100$-nál 1.
+        \end{enumerate}
+\end{itemize}
+
+\textbf{A lefedés ellenőrzése egy adott pontban:}
+Legyen a víz hőmérséklete $x = 25^\circ\text{C}$.
+A háromszög alakú tagsági függvények alapján:
+\begin{itemize}
+    \item $\mu_{\text{Hideg}}(25) = 0.5$ (Félig hideg)
+    \item $\mu_{\text{Langyos}}(25) = 0.5$ (Félig langyos)
+    \item $\mu_{\text{Forró}}(25) = 0.0$ (Egyáltalán nem forró)
+\end{itemize}
+
+$$ \text{Összeg} = 0.5 + 0.5 + 0.0 = 1.0 $$
+
+Mivel ez az egyenlőség a $[0, 100]$ intervallum minden pontjára teljesül (a háromszögek "keresztezik" egymást $0.5$-nél), a partíció \textbf{lefedi} az alaphalmazt.

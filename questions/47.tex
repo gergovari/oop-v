@@ -1,0 +1,53 @@
+\section{Ismertesse a tisztán virtuális metódus készítésének szintaktikáját! Hogyan nevezzük a legalább 1 tisztán virtuális metódust tartalmazó osztályt? Milyen szabályok vonatkoznak erre az osztályra?}
+
+A C++ nyelvben a tisztán virtuális (pure virtual) metódusok szolgálnak arra, hogy egy osztályban csak a függvény interfészét (szignatúráját) határozzuk meg, a megvalósítást (implementációt) pedig kötelezően a leszármazottakra bízzuk.
+
+\subsection{Szintaktika}
+
+A tisztán virtuális metódust a deklaráció végére írt \textbf{\texttt{= 0}} jelöléssel (pure-specifier) hozzuk létre.
+
+\begin{itemize}
+    \item A függvénynek általában nincs törzse (implementációja) az adott osztályban.
+    \item A \texttt{virtual} kulcsszó használata kötelező.
+\end{itemize}
+
+\begin{minted}{cpp}
+class Alakzat {
+public:
+    // Tisztán virtuális metódus
+    // A "= 0" jelzi, hogy itt nincs implementáció
+    virtual double terulet() const = 0; 
+    
+    // Virtuális destruktor (ajánlott)
+    virtual ~Alakzat() {}
+};
+\end{minted}
+
+\subsection{Elnevezés}
+
+Azt az osztályt, amely legalább egy tisztán virtuális metódust tartalmaz, \textbf{absztrakt osztálynak} (Abstract Class) nevezzük.
+Gyakran használják őket interfészként (Interface), ahol az összes metódus tisztán virtuális.
+
+\subsection{Az absztrakt osztályra vonatkozó szabályok}
+
+Az absztrakt osztályok viselkedése eltér a hagyományos (konkrét) osztályokétól:
+
+\begin{itemize}
+    \item \textbf{Példányosítás tilalma:}
+        Absztrakt osztályból közvetlenül \textbf{nem hozható létre objektum} (példány).
+        \begin{minted}{cpp}
+Alakzat a; // HIBA: absztrakt osztály nem példányosítható
+        \end{minted}
+    
+    \item \textbf{Pointerek és Referenciák:}
+        Bár példány nem hozható létre, \textbf{mutató (pointer) vagy referencia} típusként használható. Ez teszi lehetővé a polimorfizmust.
+        \begin{minted}{cpp}
+Alakzat* mutato = new Kor(); // HELYES (ha a Kor konkrét)
+        \end{minted}
+
+    \item \textbf{Leszármaztatási kötelezettség:}
+        Ha egy leszármazott osztály nem definiálja felül (override) az összes örökölt tisztán virtuális metódust (nem ad nekik törzset), akkor a leszármazott osztály is \textbf{absztrakt marad}, és nem lehet példányosítani.
+        
+    \item \textbf{Adattagok és konkrét metódusok:}
+        Az absztrakt osztály tartalmazhat normál (nem tisztán virtuális) tagfüggvényeket és adattagokat is, amelyek a közös logikát valósítják meg.
+\end{itemize}

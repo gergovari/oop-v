@@ -1,0 +1,79 @@
+\section{Ismertesse példával az 1 paraméterrel rendelkező konstruktor egyszerűsített meghívási lehetőségét! Hogyan tudjuk ezt az egyszerűsítést letiltani?}
+
+\subsection{Egyszerűsített meghívás (Implicit konverzió)}
+Ha egy osztály konstruktora egyetlen paraméterrel hívható meg (vagy egy paraméteres, vagy a többi paraméternek van alapértelmezett értéke), a C++ fordító ezt \textbf{konverziós konstruktornak} tekinti.
+
+\begin{itemize}
+    \item \textbf{Másoló inicializálás (Copy Initialization):}
+    Lehetővé teszi az egyenlőségjel (\texttt{=}) használatát objektum létrehozásakor, mintha csak egy primitív típust adnánk értékül.
+    \item \textbf{Paraméter átadás:}
+    Ha egy függvény paramétere az adott osztály típusú, de mi a konstruktor paraméterének megfelelő típust (pl. \texttt{int}) adunk át, a fordító automatikusan létrehoz egy ideiglenes objektumot.
+    \item \textbf{Veszélye:} Ez a működés néha nem kívánt, véletlen típuskonverziókhoz és nehezen felderíthető hibákhoz vezethet.
+\end{itemize}
+
+\subsection{Az egyszerűsítés letiltása (explicit)}
+A fenti automatizmust az \texttt{explicit} kulcsszóval tilthatjuk le.
+
+\begin{itemize}
+    \item \textbf{Használat:} A konstruktor deklarációja elé kell írni az \texttt{explicit} szót.
+    \item \textbf{Hatása:} Megtiltja az implicit konverziót és a \texttt{=} jellel történő inicializálást.
+    \item \textbf{Következmény:} Az objektumot csak direkt módon (zárójellel vagy kapcsos zárójellel) lehet inicializálni.
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a különbséget egy implicit (hagyományos) és egy \texttt{explicit} módon védett osztály között.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+// 1. Implicit konverziót engedő osztály
+class Celsius {
+public:
+    double value;
+    // Nincs 'explicit', a fordító automatikusan konvertálhat double-ből
+    Celsius(double v) : value(v) {}
+};
+
+// 2. Implicit konverziót tiltó osztály
+class Fahrenheit {
+public:
+    double value;
+    // 'explicit': csak direkt hívás engedélyezett!
+    explicit Fahrenheit(double v) : value(v) {}
+};
+
+void printCelsius(Celsius c) {
+    std::cout << c.value << " C" << std::endl;
+}
+
+void printFahrenheit(Fahrenheit f) {
+    std::cout << f.value << " F" << std::endl;
+}
+
+int main() {
+    // --- Implicit eset (Celsius) ---
+    
+    // Működik: egyszerűsített (másoló) inicializálás
+    Celsius c1 = 25.0; 
+    
+    // Működik: implicit konverzió függvényhíváskor
+    // A fordító látja, hogy 10.0 (double) -> Celsius konstruktor létezik
+    printCelsius(10.0); 
+
+    // --- Explicit eset (Fahrenheit) ---
+    
+    // HIBA: "conversion from double to non-scalar type requested"
+    // Fahrenheit f1 = 80.0; 
+
+    // HIBA: a függvény Fahrenheit-et vár, de double-t kapott,
+    // és az automatikus átalakítás tiltva van.
+    // printFahrenheit(80.0);
+
+    // HELYES HASZNÁLAT explicit konstruktornál:
+    Fahrenheit f2(80.0);       // Direkt inicializálás
+    Fahrenheit f3 = Fahrenheit(80.0); // Explicit konverzió
+    printFahrenheit(Fahrenheit(80.0)); // Ideiglenes obj. létrehozása
+    
+    return 0;
+}
+\end{minted}

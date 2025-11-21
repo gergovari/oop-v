@@ -1,0 +1,86 @@
+\section{Ismertessen defuzzifikációs módszereket!}
+
+A defuzzifikáció a fuzzy következtetési folyamat utolsó lépése. A szabályok kiértékelése és aggregálása után kapott \textit{eredő fuzzy halmazt} (amely egy függvény a $[0, 1]$ intervallumon) átalakítja egyetlen konkrét, \textbf{éles (crisp) számértékké}. Erre azért van szükség, mert a fizikai beavatkozók (pl. motor feszültsége, szelep nyitása) konkrét számokat várnak.
+
+\subsection{1. Súlypont módszer (Center of Gravity - COG)}
+
+Ez a legelterjedtebb és leggyakrabban használt módszer (pl. Mamdani rendszereknél).
+
+\begin{itemize}
+    \item \textbf{Elve:} Az aggregált fuzzy halmaz alatti terület geometriai súlypontjának $x$ koordinátáját határozza meg.
+    \item \textbf{Matematikai formula (folytonos eset):}
+    $$ y_{COG} = \frac{\int_{X} x \cdot \mu(x) \, dx}{\int_{X} \mu(x) \, dx} $$
+    \item \textbf{Diszkrét eset (számítógépes megvalósítás):}
+    $$ y_{COG} \approx \frac{\sum_{i=1}^{n} x_i \cdot \mu(x_i)}{\sum_{i=1}^{n} \mu(x_i)} $$
+    \item \textbf{Előnye:} Folytonos, sima átmenetet biztosít a kimeneten. Ha a bemenet kicsit változik, a kimenet is csak kicsit fog változni.
+    \item \textbf{Hátránya:} Számításigényes (integrálás vagy sűrű mintavételezés kell).
+\end{itemize}
+
+\subsection{2. Maximum középérték módszer (Mean of Maxima - MOM)}
+
+Ez a módszer csak azokat az értékeket veszi figyelembe, ahol a tagsági függvény a maximumát veszi fel.
+
+\begin{itemize}
+    \item \textbf{Elve:} Megkeresi az eredő halmaz maximumát (pl. a platót). Ha több ilyen pont van (vagy egy szakasz), akkor ezek számtani közepét veszi.
+    \item \textbf{Formula:}
+    $$ y_{MOM} = \frac{\int_{x \in M} x \, dx}{\int_{x \in M} dx} $$
+    ahol $M = \{ x \in X \mid \mu(x) = \text{hgt}(A) \}$ a maximális helyek halmaza.
+    \item \textbf{Előnye:} Gyorsabb, mint a COG.
+    \item \textbf{Hátránya:} Nem folytonos. A kimenet ugrálhat (pl. ha két távoli csúcs között billeg a maximum, az átlag hirtelen változhat). Inkább alakfelismerésnél (klasszifikáció) használják, szabályozásnál ritkán.
+\end{itemize}
+
+\subsection{3. Egyéb maximum-alapú módszerek}
+
+Ha a maximális tagsági érték nem egy pontban, hanem egy tartományon (platón) jelentkezik:
+
+\begin{itemize}
+    \item \textbf{First of Maxima (FOM):} A maximális értékek közül a legkisebb $x$ koordinátájút választja.
+    \item \textbf{Last of Maxima (LOM):} A maximális értékek közül a legnagyobb $x$ koordinátájút választja.
+\end{itemize}
+
+\subsection{4. Összegsúlypont módszer (Center of Sums - COS)}
+
+Hasonló a COG-hoz, de a halmazok aggregálásánál nem az Uniót (maximum), hanem az összeadást használja.
+
+\begin{itemize}
+    \item \textbf{Elve:} A szabályokból kapott rész-halmazok területeit összeadja (az átfedéseket duplán számolja), és ennek számolja a súlypontját.
+    \item \textbf{Előnye:} Gyorsabban számolható, mert a részhalmazok súlypontjai előre kiszámolhatók és tárolhatók.
+\end{itemize}
+
+\subsection{Összehasonlító példa kódban}
+
+
+
+\begin{minted}{python}
+import numpy as np
+
+def defuzzify_example(x_axis, mu_values):
+    # 1. Súlypont (COG)
+    # Számláló: x * mu(x) összege
+    numerator = np.sum(x_axis * mu_values)
+    # Nevező: mu(x) összege (terület)
+    denominator = np.sum(mu_values)
+    
+    cog = numerator / denominator if denominator != 0 else 0
+    
+    # 2. Mean of Maxima (MOM)
+    # Megkeressük a legnagyobb tagsági értéket
+    max_val = np.max(mu_values)
+    # Megkeressük az összes indexet, ahol ez az érték szerepel
+    indices = np.where(mu_values == max_val)[0]
+    # Vesszük az ezekhez tartozó x értékek átlagát
+    mom = np.mean(x_axis[indices])
+    
+    return cog, mom
+
+# Példa: Egy "M" alakú eloszlás (két csúcs)
+x = np.array([10, 20, 30, 40, 50])
+mu = np.array([0.2, 1.0, 0.4, 0.9, 0.1]) 
+# Itt a max 1.0 (20-nál), a második csúcs 0.9 (40-nél)
+
+cog_res, mom_res = defuzzify_example(x, mu)
+
+# Eredmény:
+# MOM: 20 (Csak a legmagasabb csúcsot nézi)
+# COG: ~28 (A 40-nél lévő nagy tömeg "elhúzza" a súlypontot jobbra)
+\end{minted}

@@ -1,0 +1,75 @@
+\section{Ismertesse az adattagok kezdeti értékmegadásának lehetőségeit! Ezek közül melyik az, amelyik referencia típusú adattagok esetén használható?}
+
+\subsection{Az értékmegadás lehetőségei}
+C++-ban három fő módja van az osztály adattagjainak kezdeti értékkel való ellátására. Fontos különbséget tenni az \textit{inicializáció} és az \textit{értékadás} között.
+
+\begin{enumerate}
+    \item \textbf{Taginicializáló lista (Member Initializer List):}
+    \begin{itemize}
+        \item A konstruktor paraméterlistája után, kettősponttal (\texttt{:}) elválasztva.
+        \item Ez a valódi inicializáció helye: az értékadás még az objektum memóriaterületének létrejöttekor történik, a konstruktor törzse \textit{előtt}.
+        \item A leggyorsabb és leghatékonyabb módszer.
+    \end{itemize}
+
+    \item \textbf{Értékadás a konstruktor törzsében:}
+    \begin{itemize}
+        \item A változó először létrejön (lefut a default konstruktora), majd a törzsben kap új értéket.
+        \item Technikailag ez nem inicializálás, hanem felülírás.
+        \item Lassabb lehet összetett objektumoknál (felesleges default konstruktor hívás + értékadás operátor).
+    \end{itemize}
+
+    \item \textbf{Osztályon belüli inicializálás (In-class member initialization - C++11):}
+    \begin{itemize}
+        \item A deklarációval egy helyen adunk alapértéket (pl. \texttt{int x = 0;}).
+        \item Ha a konstruktor inicializáló listájában is szerepel a változó, az felülírja ezt az alapértelmezett értéket.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Referencia típusú adattagok kezelése}
+A referencia típusú (\texttt{\&}) adattagok esetén **kizárólag a Taginicializáló lista** (vagy ritkábban az osztályon belüli inicializálás) használható.
+
+\begin{itemize}
+    \item \textbf{Ok:} A referenciát a létrehozása pillanatában „hozzá kell kötni” valamihez.
+    \item Nem létezhet „üres” referencia, amit később állítunk be.
+    \item A konstruktor törzsében történő értékadás már túl késő lenne, mert addigra a tagnak léteznie kellene (de inicializáló lista nélkül nem tud létrejönni).
+    \item Ugyanez a szabály vonatkozik a \texttt{const} adattagokra is.
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a helyes (inicializáló lista) és a helytelen (törzsben értékadás) használatot referencia esetén.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class Wrapper {
+private:
+    int& refMember; // Referencia adattag
+    int valMember;  // Sima adattag
+
+public:
+    // HELYES MEGOLDÁS:
+    // A 'refMember' kötése a listában történik.
+    Wrapper(int& target, int value) 
+        : refMember(target), // Kötelező itt!
+          valMember(value)   // Opcionális, de ajánlott itt
+    {
+        // A konstruktor törzse
+    }
+
+    /* HIBÁS MEGOLDÁS (Compile Error):
+    
+    Wrapper(int& target, int value) {
+        refMember = target; // HIBA!
+        // Itt a refMember-nek már léteznie kellene, 
+        // de nincs mihez kötve. Ráadásul referenciát 
+        // nem lehet átirányítani (rebind).
+        
+        valMember = value; // Ez működne, de nem hatékony.
+    }
+    */
+};
+
+int main() {
+    int x = 10;
+    Wrapper w(x, 5); // A w.refMember mostantól x-re hivatkozik
+    return 0;
+}
+\end{minted}

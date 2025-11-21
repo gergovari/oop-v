@@ -1,5 +1,7 @@
 \documentclass{article}
 
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage[provide=*, magyar]{babel}
 
 \usepackage{graphicx}
@@ -59,8 +61,15 @@
 
 \usepackage[margin=2.5cm]{geometry}
 
-\input{title}
+\setminted[cpp]{
+	fontsize=\small,
+	baselinestretch=1.2,
+	linenos,
+	numbersep=5pt,
+	gobble=0,
+}
 
+\input{title}
 
 \newcounter{questionNum}
 \setcounter{questionNum}{1}

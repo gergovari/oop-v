@@ -1,0 +1,78 @@
+\section{Ismertesse a fájlok kezelésére használt osztályt, gyakran használt metódusait és operátorait!}
+
+A C++ nyelvben a fájlkezelés a streameken (adatfolyamokon) keresztül történik, hasonlóan a konzolos kommunikációhoz. A szükséges osztályokat az \texttt{<fstream>} header tartalmazza.
+
+\subsection{Az alapvető osztályok}
+
+A fájlkezelés iránya határozza meg, melyik osztályt használjuk:
+
+\begin{itemize}
+    \item \textbf{\texttt{std::ofstream} (Output File Stream):} Fájlba írásra szolgál. Ha a fájl nem létezik, létrehozza.
+    \item \textbf{\texttt{std::ifstream} (Input File Stream):} Fájlból való olvasásra szolgál.
+    \item \textbf{\texttt{std::fstream} (File Stream):} Kétirányú kommunikációt (írást és olvasást is) lehetővé tesz.
+\end{itemize}
+
+\subsection{Megnyitás és fájlmódok}
+
+A fájlokat megnyithatjuk a konstruktorban vagy az \texttt{open()} metódussal. A második paraméter határozza meg a megnyitás módját (ezek kombinálhatók a \texttt{|} operátorral):
+
+\begin{itemize}
+    \item \textbf{\texttt{std::ios::in}:} Megnyitás olvasásra (alapértelmezett \texttt{ifstream}-nél).
+    \item \textbf{\texttt{std::ios::out}:} Megnyitás írásra (alapértelmezett \texttt{ofstream}-nél). Felülírja a fájlt!
+    \item \textbf{\texttt{std::ios::app}:} Hozzáfűzés (Append). A meglévő tartalom megmarad, az írás a végére kerül.
+    \item \textbf{\texttt{std::ios::binary}:} Bináris mód (pl. képek, struktúrák mentésekor), kikapcsolja a szöveges konverziókat.
+\end{itemize}
+
+\subsection{Fontos tagfüggvények (Metódusok)}
+
+\begin{itemize}
+    \item \textbf{\texttt{open(filename, mode)}:} Hozzárendeli a streamet egy fizikai fájlhoz.
+    \item \textbf{\texttt{is\_open()}:} Logikai értékkel tér vissza: sikerült-e a fájl megnyitása? (Mindig ellenőrizni kell!).
+    \item \textbf{\texttt{close()}:} Bezárja a fájlt és menti a pufferek tartalmát. (A destruktor is meghívja, de ajánlott explicit módon használni).
+    \item \textbf{\texttt{eof()}:} (End Of File) Igazat ad, ha elértük a fájl végét olvasáskor.
+    \item \textbf{\texttt{getline(stream, string)}:} Globális segédfüggvény, amely egy teljes sort olvas be a fájlból (a szóközt is beleértve), amíg sortörést nem talál.
+\end{itemize}
+
+\subsection{Operátorok}
+
+Mivel az osztályok az \texttt{iostream}-ből származnak, az operátorok megegyeznek a konzolos I/O-val:
+
+\begin{itemize}
+    \item \textbf{\texttt{<<} (Insertion):} Adat írása a fájlba (formázott szövegként).
+    \item \textbf{\texttt{>>} (Extraction):} Adat olvasása a fájlból (whitespace karaktereknél megáll).
+\end{itemize}
+
+\subsection{Példa: Írás és olvasás}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int main() {
+    // 1. Írás fájlba
+    std::ofstream kimenet("adatok.txt"); // Létrehozás és megnyitás
+    if (kimenet.is_open()) {
+        kimenet << "Elso sor" << std::endl;
+        kimenet << 123 << std::endl;
+        kimenet.close(); // Lezárás
+    }
+
+    // 2. Olvasás fájlból
+    std::ifstream bemenet("adatok.txt");
+    std::string sor;
+
+    if (bemenet.is_open()) {
+        // Soronkénti beolvasás while ciklussal
+        // A getline visszatérési értéke maga a stream, ami false-t ad hiba/EOF esetén
+        while (std::getline(bemenet, sor)) {
+            std::cout << "Beolvasva: " << sor << std::endl;
+        }
+        bemenet.close();
+    } else {
+        std::cerr << "Hiba a fajl megnyitasakor!" << std::endl;
+    }
+
+    return 0;
+}
+\end{minted}

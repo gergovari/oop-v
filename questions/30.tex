@@ -1,0 +1,83 @@
+\section{Ismertesse az „=” operátor túlterhelésének szintaktikáját és a szituációt, amelyben a fordító által biztosított operátor nem működik megfelelően!}
+
+\subsection{Szintaktikai szabályok}
+Az értékadó operátor (\texttt{operator=}) túlterhelésére szigorú szabályok vonatkoznak, mivel alapvető nyelvi elemet módosítunk.
+
+\begin{itemize}
+    \item \textbf{Csak tagfüggvény lehet:} Az értékadó operátort \textbf{tilos} globális (barát) függvényként definiálni. Mindenképpen az osztály nem statikus tagfüggvényének kell lennie.
+    \item \textbf{Szignatúra:} A konvenció szerint a következő formát követi:
+    \begin{itemize}
+        \item \textbf{Visszatérési érték:} Referencia az osztály típusára (\texttt{Osztaly\&}). Erre a \textbf{láncolhatóság} miatt van szükség (pl. \texttt{a = b = c;}).
+        \item \textbf{Paraméter:} Konstans referencia a forrás objektumra (\texttt{const Osztaly\& other}).
+    \end{itemize}
+    \item \textbf{Ön-értékadás figyelése:} A függvény törzsének elején ellenőrizni kell, hogy az objektum saját magát kapta-e értékül (\texttt{this != \&other}). Enélkül erőforrás-kezelési hiba léphet fel (töröljük az adatot, mielőtt lemásolnánk).
+\end{itemize}
+
+\subsection{A fordító által biztosított operátor problémája}
+Ha nem írunk sajátot, a fordító generál egy alapértelmezett értékadó operátort.
+
+\begin{itemize}
+    \item \textbf{Működése:} \textit{Sekély másolást} (shallow copy) végez, azaz az adattagok értékeit bitről-bitre átmásolja (tagról tagra értékadás).
+    \item \textbf{A kritikus szituáció (Pointerek):} Ha az osztály dinamikusan foglalt memóriát kezel (nyers pointer adattag), a sekély másolás csak a pointerek memóriacímét másolja át.
+    \item \textbf{A hiba következményei:}
+    \begin{enumerate}
+        \item \textbf{Memóriaszivárgás (Memory Leak):} A bal oldali objektum (amely felülíródik) korábbi pointere elveszik anélkül, hogy felszabadítottuk volna a hozzá tartozó memóriát.
+        \item \textbf{Osztozott birtoklás:} Két objektum ugyanarra a memóriaterületre mutat. Ha az egyik módosítja, a másik is változik.
+        \item \textbf{Double Free:} Amikor az objektumok megszűnnek, mindkét destruktor megpróbálja felszabadítani (\texttt{delete}) ugyanazt a címet, ami programösszeomlást okoz.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Megvalósítási minta (Idiómák)}
+A helyes implementációnak négy lépése van:
+\begin{enumerate}
+    \item Ön-értékadás vizsgálata.
+    \item A régi (bal oldali) erőforrás felszabadítása.
+    \item Új memória foglalása és az adat másolása (Mély másolás).
+    \item Referencia visszaadása (\texttt{*this}).
+\end{enumerate}
+
+\subsection{Példakód}
+Az alábbi példa a helyes implementációt mutatja dinamikus memóriakezelés esetén.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class StringHolder {
+private:
+    char* str;
+
+public:
+    StringHolder(const char* s) {
+        // ... konstruktor implementáció (memória foglalás) ...
+    }
+
+    // Értékadó operátor felülírása
+    StringHolder& operator=(const StringHolder& other) {
+        // 1. LÉPÉS: Ön-értékadás vizsgálata
+        // Ha a két objektum címe megegyezik, nincs teendő.
+        // Enélkül a 2. lépésben törölnénk azt az adatot, 
+        // amit a 3. lépésben másolni akarnánk!
+        if (this == &other) {
+            return *this;
+        }
+
+        // 2. LÉPÉS: Régi erőforrás takarítása
+        // Mivel ez az objektum már létezik, lehet benne adat.
+        delete[] str; 
+
+        // 3. LÉPÉS: Mély másolás (Deep Copy)
+        if (other.str) {
+            // Új tárterület kérése
+            int len = std::strlen(other.str);
+            str = new char[len + 1];
+            // Adatok átmásolása
+            std::strcpy(str, other.str);
+        } else {
+            str = nullptr;
+        }
+
+        // 4. LÉPÉS: Visszatérés önmagunkkal
+        return *this; 
+    }
+    
+    ~StringHolder() { delete[] str; }
+};
+\end{minted}

@@ -1,0 +1,80 @@
+\section{Ismertesse a „new” és „delete” operátorok túlterhelésének szabályait!}
+
+A C++ nyelvben a memóriakezelés testreszabható a \texttt{new} és \texttt{delete} operátorok túlterhelésével. Fontos különbséget tenni a \textit{new kifejezés} (amely memóriát foglal és konstruktort hív) és az \textit{operator new} (amely csak a nyers memóriát foglalja) között. Túlterhelni csak az utóbbit lehet.
+
+\subsection{Alapvető szintaxis és szignatúrák}
+
+Az operátorok túlterhelésekor szigorú előírások vonatkoznak a függvények szignatúrájára.
+
+\begin{itemize}
+    \item \textbf{operator new:}
+        \begin{itemize}
+            \item Visszatérési értéke kötelezően \texttt{void*}.
+            \item Első paramétere kötelezően \texttt{size\_t} típusú (a szükséges bájtok száma).
+            \item További paraméterek is megadhatók (pl. \textit{placement new} esetén), de az első a méret marad.
+        \end{itemize}
+    \item \textbf{operator delete:}
+        \begin{itemize}
+            \item Visszatérési értéke \texttt{void}.
+            \item Első paramétere kötelezően \texttt{void*} (a felszabadítandó terület mutatója).
+            \item Opcionálisan átveheti a \texttt{size\_t} méretet is második paraméterként.
+        \end{itemize}
+\end{itemize}
+
+\begin{minted}{cpp}
+// Példa osztályszintű deklarációra
+class MyClass {
+public:
+    // Allokáció
+    static void* operator new(size_t size) {
+        std::cout << "Egyedi new: " << size << " bájt\n";
+        return ::operator new(size); // Globális hívása
+    }
+
+    // Deallokáció
+    static void operator delete(void* p) {
+        std::cout << "Egyedi delete\n";
+        ::operator delete(p); // Globális hívása
+    }
+};
+\end{minted}
+
+\subsection{Osztályszintű szabályok (Class-specific)}
+
+Ha egy osztályon belül definiáljuk ezeket az operátorokat:
+
+\begin{itemize}
+    \item \textbf{Implicit statikusság:} Ezek a tagfüggvények mindig \texttt{static}-ok, még akkor is, ha nem írjuk ki eléjük a kulcsszót. Ennek oka, hogy a \texttt{new} hívásakor az objektum még nem létezik, a \texttt{delete} hívásakor pedig már megszűnt (vagy épp megszűnik).
+    \item \textbf{Öröklődés:} A származtatott osztályok öröklik a bázisosztály allokátorait, kivéve, ha felüldefiniálják őket.
+    \item \textbf{Tömbös változatok:} A \texttt{new[]} és \texttt{delete[]} operátorok függetlenek a skalár (egyes) változataiktól, azokat külön kell túlterhelni.
+\end{itemize}
+
+\subsection{Globális szabályok (Global scope)}
+
+Lehetőség van a globális \texttt{operator new} és \texttt{operator delete} lecserélésére is:
+
+\begin{itemize}
+    \item \textbf{Hatáskör:} Ha globálisan definiáljuk őket, az a teljes programra kihat (beleértve az STL konténereket és a \texttt{main}-en kívüli statikus inicializálásokat is).
+    \item \textbf{Veszélyek:} A globális csere rendkívül kockázatos; hiba esetén a program összeomolhat vagy memóriaszivárgás léphet fel rendszer szinten.
+    \item \textbf{Szabványos szignatúra:} Nem lehet namespace-be tenni, a globális névtérben kell lenniük.
+\end{itemize}
+
+\subsection{Kivételkezelés és konvenciók}
+
+A helyes működés érdekében be kell tartani az alábbi konvenciókat:
+
+\begin{itemize}
+    \item \textbf{Sikertelen foglalás:} Ha a \texttt{new} nem tud memóriát foglalni, \texttt{std::bad\_alloc} kivételt kell dobnia (vagy \texttt{nullptr}-t visszaadni a \texttt{nothrow} változat esetén), nem térhet vissza \texttt{NULL}-lal csendben.
+    \item \textbf{Végtelen ciklus:} Gyakori minta, hogy a \texttt{new} egy ciklusban próbál foglalni, és sikertelenség esetén meghívja a \texttt{std::new\_handler}-t.
+    \item \textbf{Nullptr törlése:} A \texttt{delete} operátornak biztonságosan kezelnie kell a \texttt{nullptr} bemenetet (ilyenkor nem csinál semmit).
+    \item \textbf{Párosítás elve:} Ha túlterheled a \texttt{new}-t, kötelező túlterhelni a \texttt{delete}-t is! Ha ez elmarad, a memória allokációja az egyedi módon, a felszabadítása viszont az alapértelmezett módon történne, ami undefined behavior-höz vezethet.
+\end{itemize}
+
+\subsection{Placement New szabályai}
+
+A \textit{placement new} (amely extra paramétereket fogad) speciális eset:
+
+\begin{itemize}
+    \item Csak akkor hívódik hozzá tartozó \textit{placement delete}, ha a konstruktor kivételt dob a létrehozás során.
+    \item Minden egyedi paraméterezésű \texttt{operator new}-hoz célszerű definiálni a megfelelő szignatúrájú \texttt{operator delete}-t a kivételbiztonság érdekében.
+\end{itemize}

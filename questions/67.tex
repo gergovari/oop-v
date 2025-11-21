@@ -1,0 +1,46 @@
+\section{Ismertesse az aggregációs operátorok definícióját, és 5 axiómáját!}
+
+A fuzzy rendszerekben és döntéstámogatásban az aggregációs operátorok feladata, hogy több bemeneti értékből (pl. több szabály következtetéséből vagy több kritérium értékeléséből) egyetlen összevont értéket állítsanak elő.
+
+\subsection{Definíció}
+
+Az $h: [0, 1]^n \to [0, 1]$ leképezést aggregációs operátornak nevezzük, ha az több ($n$ darab), a $[0, 1]$ zárt intervallumba eső bemenethez rendel hozzá egyetlen, szintén a $[0, 1]$ intervallumba eső kimeneti értéket.
+
+Formálisan: $y = h(x_1, x_2, \dots, x_n)$.
+
+\subsection{Az 5 alapvető axióma (Tulajdonság)}
+
+A szakirodalom általában az alábbi öt tulajdonságot (axiómát) várja el egy általános célú, jól viselkedő aggregációs operátortól:
+
+\begin{enumerate}
+    \item \textbf{Peremfeltételek (Boundary Conditions):}
+        Az operátornak meg kell őriznie az univerzum szélsőértékeit. Ha minden bemenet a minimum, az eredmény is minimum; ha minden bemenet maximum, az eredmény is maximum.
+        $$ h(0, 0, \dots, 0) = 0 $$
+        $$ h(1, 1, \dots, 1) = 1 $$
+
+    \item \textbf{Monotonitás (Monotonicity):}
+        Az operátor nem csökkenő függvény a változói szerint. Ha bármelyik bemeneti érték növekszik (miközben a többi változatlan), a kimeneti érték nem csökkenhet.
+        $$ \text{Ha } x_i \leq y_i \text{ minden } i\text{-re, akkor } h(\mathbf{x}) \leq h(\mathbf{y}) $$
+
+    \item \textbf{Folytonosság (Continuity):}
+        Az operátor legyen folytonos függvény a teljes értelmezési tartományon. Ez biztosítja a rendszer stabilitását: a bemenetek kis megváltozása csak kis változást okozhat a kimeneten, nincsenek ugrásszerű változások.
+
+    \item \textbf{Szimmetria vagy Kommutativitás (Symmetry):}
+        A bemeneti változók sorrendje nem befolyásolhatja az eredményt (a bemenetek egyenrangúak).
+        $$ h(x_1, x_2, \dots, x_n) = h(x_{\pi(1)}, x_{\pi(2)}, \dots, x_{\pi(n)}) $$
+        ahol $\pi$ az indexek egy tetszőleges permutációja.
+
+    \item \textbf{Idempotencia (Idempotency):}
+        Ha az összes bemenet ugyanazt a $c$ értéket veszi fel, akkor az aggregált értéknek is pontosan $c$-nek kell lennie.
+        $$ h(c, c, \dots, c) = c $$
+        \textit{Megjegyzés:} Ez a tulajdonság jellemzően az átlagoló (averaging) operátorokra igaz, a t-normákra és s-normákra általában nem.
+\end{enumerate}
+
+\subsection{Osztályozás az idempotencia alapján}
+
+Az 5. axiómához való viszony alapján az operátorok lehetnek:
+\begin{itemize}
+    \item \textbf{Átlagoló (Averaging):} Teljesítik az idempotenciát (pl. számtani közép).
+    \item \textbf{Konjunktív (And-like):} $h(c, \dots, c) \leq c$ (pl. t-normák, min).
+    \item \textbf{Diszjunktív (Or-like):} $h(c, \dots, c) \geq c$ (pl. s-normák, max).
+\end{itemize}

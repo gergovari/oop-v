@@ -1,0 +1,74 @@
+\section{Ismertesse a C++ hibakezelésben használható try-catch blokk működését!}
+
+\subsection{Alapfogalmak és Cél}
+\begin{itemize}
+    \item \textbf{Cél:} A futásidejű hibák (runtime errors) strukturált kezelése a program összeomlásának elkerülése érdekében.
+    \item \textbf{Elv:} A normál üzleti logika és a hibakezelő kód szétválasztása.
+    \item \textbf{Kivétel (Exception):} Egy objektum vagy primitív érték, amely a hiba fellépésekor információt hordoz a problémáról.
+\end{itemize}
+
+\subsection{A három fő komponens}
+\begin{enumerate}
+    \item \textbf{\texttt{try} (próbablock):}
+    Ide kerül az a kód, amely potenciálisan hibát okozhat (kivételt dobhat).
+    
+    \item \textbf{\texttt{throw} (dobás):}
+    Ha hiba lép fel, ezzel az utasítással "dobjuk el" a kivételt. Ekkor a normál futás megszakad.
+    
+    \item \textbf{\texttt{catch} (elfogó blokk):}
+    Ez a blokk kapja el a dobott kivételt. Itt történik a hiba elhárítása, naplózása vagy a felhasználó értesítése.
+\end{enumerate}
+
+\subsection{Működési folyamat}
+\begin{itemize}
+    \item A program belép a \texttt{try} blokkba.
+    \item Ha minden rendben, a \texttt{catch} blokkokat átugorja.
+    \item Ha \texttt{throw} történik:
+    \begin{enumerate}
+        \item A vezérlés azonnal kilép a \texttt{try} blokkból (a további utasítások nem futnak le).
+        \item \textbf{Stack Unwinding (Verem visszabontása):} A \texttt{try} blokkban létrehozott lokális objektumok destruktorai lefutnak (memória felszabadul).
+        \item A rendszer megkeresi a típusban illeszkedő \texttt{catch} ágat és átadja neki a vezérlést.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Példa: Nullával való osztás kezelése}
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+double osztas(double szamlalo, double nevezo) {
+    if (nevezo == 0) {
+        // Hiba jelzése egy kivétel dobásával
+        // Itt most egy szöveget (const char*) dobunk
+        throw "Hiba: Nullaval valo osztas!";
+    }
+    return szamlalo / nevezo;
+}
+
+int main() {
+    try {
+        // Védett kódblokk
+        std::cout << "Eredmeny: " << osztas(10, 2) << std::endl; // OK
+        std::cout << "Eredmeny: " << osztas(5, 0) << std::endl;  // Hiba!
+        
+        // Ez a sor már NEM fut le a hiba miatt:
+        std::cout << "Ez nem jelenik meg." << std::endl;
+        
+    } catch (const char* hibaUzenet) {
+        // Hiba elkapása és kezelése
+        std::cerr << "Kivetel elkapva: " << hibaUzenet << std::endl;
+    } catch (...) {
+        // "Joker" catch ág: minden egyéb típust elkap
+        std::cerr << "Ismeretlen hiba tortent!" << std::endl;
+    }
+
+    return 0;
+}
+\end{minted}
+
+\subsection{Fontos szabályok}
+\begin{itemize}
+    \item \textbf{Típusillesztés:} A \texttt{catch} paraméterének típusának egyeznie kell a \texttt{throw} által dobott típusával (vagy annak ősosztályával).
+    \item \textbf{Sorrend:} Több \texttt{catch} ág esetén a speciálisabb (leszármazott) kivételeket előbb kell elkapni, az általánosabbakat (ősosztály) később.
+    \item \textbf{\texttt{catch(...)}}: A három ponttal jelölt catch blokk minden kivételt elkap, típustól függetlenül (általában utolsó ágként használjuk).
+\end{itemize}

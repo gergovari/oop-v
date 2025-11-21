@@ -1,0 +1,77 @@
+\section{Ismertesse ábrával a virtuális öröklődés szükségességét előidéző szituációt!}
+
+A virtuális öröklődés szükségessége a \textbf{többszörös öröklődés} egy speciális esetében, az úgynevezett \textbf{Rombusz-probléma} (Diamond Problem) során merül fel.
+
+\subsection{A probléma leírása}
+
+Ha egy osztálynak (D) két olyan közvetlen őse van (B és C), amelyek ugyanabból a közös ősosztályból (A) származnak, akkor a normál öröklődés során duplikáció és kétértelműség lép fel.
+
+\begin{itemize}
+    \item \textbf{Adatduplikáció:} A végső leszármazott (D) két példányban tartalmazza a közös ős (A) adattagjait. (Egyszer a „B” ágon, egyszer a „C” ágon keresztül).
+    \item \textbf{Kétértelműség (Ambiguity):} Ha a közös ős egy tagjára hivatkozunk a „D” objektumon keresztül, a fordító nem tudja eldönteni, melyik példányt (az „B”-ben lévőt vagy a „C”-ben lévőt) kell használni.
+\end{itemize}
+
+\subsection{Strukturális Ábra (A Rombusz)}
+
+
+
+\begin{verbatim}
+          +-----------+
+          |  Osztály A |  (pl. Jármű)
+          |   (int id) |
+          +-----------+
+            /       \
+           /         \
+  +-----------+   +-----------+
+  |  Osztály B |   |  Osztály C | (pl. Szárazföldi / Vízi)
+  | (Örökli A-t)|   | (Örökli A-t)|
+  +-----------+   +-----------+
+           \         /
+            \       /
+          +-----------+
+          |  Osztály D | (pl. Kétéltű)
+          | (Örökli B-t|
+          |    és C-t) |
+          +-----------+
+\end{verbatim}
+
+Hiba: A „D” osztályban \textbf{két darab} „id” változó keletkezik ($A_{viaB}::id$ és $A_{viaC}::id$).
+
+\subsection{Megoldás: Virtuális öröklődés}
+
+A problémát úgy oldjuk meg, hogy a közbenső szinteken (B és C) \texttt{virtual public} módon örököljük az őst. Ez garantálja, hogy a „D” osztályban csak \textbf{egyetlen, közös példány} jöjjön létre az „A” osztályból.
+
+\subsection{Példa a hibás és javított esetre}
+
+\begin{minted}{cpp}
+struct A { int adat; };
+
+// 1. A PROBLÉMÁS ESET (Normál öröklés)
+struct B : public A {};
+struct C : public A {};
+struct D : public B, public C {};
+
+void hiba() {
+    D obj;
+    // obj.adat = 10; // HIBA! "Ambiguous" (Kétértelmű)
+    
+    // Csak így érhető el (kényelmetlen és redundáns):
+    obj.B::adat = 10;
+    obj.C::adat = 20; 
+}
+
+// ---------------------------------------------
+
+// 2. A MEGOLDÁS (Virtuális öröklés)
+// A 'virtual' kulcsszó biztosítja a közös példányt
+struct V_B : virtual public A {};
+struct V_C : virtual public A {};
+
+// A végső osztályban (V_D) csak EGY 'A' lesz
+struct V_D : public V_B, public V_C {};
+
+void megoldas() {
+    V_D obj;
+    obj.adat = 10; // MŰKÖDIK! Nincs kétértelműség.
+}
+\end{minted}

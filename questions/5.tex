@@ -1,0 +1,75 @@
+\section{Ismertesse a C++ nyelvben a függvények túlterhelésének lehetőségét és ennek szabályait!}
+
+\subsection{Fogalma és Lényege}
+\begin{itemize}
+    \item \textbf{Definíció:} A függvénytúlterhelés (function overloading) lehetővé teszi, hogy több függvény \textbf{azonos névvel}, de \textbf{eltérő paraméterlistával} (szignatúrával) létezzen egy hatókörön (scope) belül.
+    \item \textbf{Polimorfizmus:} Ez a statikus (fordítási idejű) polimorfizmus egyik formája.
+    \item \textbf{Működés:} A fordító a híváskor átadott argumentumok típusa és száma alapján választja ki a megfelelő függvényváltozatot (Resolution).
+\end{itemize}
+
+\subsection{A megkülönböztetés szabályai}
+A C++ fordító a szignatúra alapján különbözteti meg a függvényeket. A túlterhelés akkor érvényes, ha az alábbiak közül legalább egy teljesül:
+
+\begin{enumerate}
+    \item \textbf{Paraméterek száma:} Eltérő darabszámú argumentum.
+    \item \textbf{Paraméterek típusa:} A paraméterek típusai különböznek.
+    \item \textbf{Paraméterek sorrendje:} Különböző típusú paraméterek eltérő sorrendben szerepelnek.
+\end{enumerate}
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+void print(int a);              // Alap
+void print(double a);           // Eltérő típus
+void print(int a, int b);       // Eltérő darabszám
+void print(char* c);            // Eltérő típus
+\end{minted}
+
+\subsection{Szigorú korlátok és hibalehetőségek}
+
+\subsubsection{1. Visszatérési érték (Return Type)}
+\textbf{Nem lehet} függvényt túlterhelni kizárólag a visszatérési érték típusa alapján.
+\begin{itemize}
+    \item \textit{Ok:} A függvényhíváskor nem mindig használjuk fel a visszatérési értéket, így a fordító nem tudná eldönteni, melyik verziót futtassa.
+\end{itemize}
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+int szamol(int x) { return x; }
+double szamol(int x) { return x * 1.5; } 
+// -> FORDÍTÁSI HIBA: Újradefiniálás, a paraméterlista azonos!
+\end{minted}
+
+\newpage
+\subsubsection{2. Kétértelműség (Ambiguity)}
+Olyan helyzet, amikor a fordító több lehetséges függvényt is talál, és nem tud dönteni (pl. automatikus típuskonverziók vagy default paraméterek miatt).
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+void teszt(float f);
+void teszt(double d);
+
+// Hívás:
+teszt(3.14); 
+// -> Sikeres: double literál, a másodikat hívja.
+
+teszt(5);    
+// -> HIBA (Ambiguous call): 
+// Az int konvertálható float-tá és double-lé is. 
+// A fordító nem tud választani.
+\end{minted}
+
+\subsection{Összefoglaló táblázat}
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Megkülönböztető tényező} & \textbf{Lehet túlterhelni?} \\
+\hline
+Paraméterek száma & IGEN \\
+\hline
+Paraméterek típusa & IGEN \\
+\hline
+Paraméterek sorrendje (eltérő típusnál) & IGEN \\
+\hline
+Csak visszatérési érték & \textbf{NEM} \\
+\hline
+Csak paraméter neve & \textbf{NEM} \\
+\hline
+\end{tabular}
+\end{center}

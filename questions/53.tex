@@ -1,0 +1,84 @@
+\section{Ismertesse a list STL tároló tulajdonságait (memória modell, bejárás, bővíthetőség)!}
+
+Az \texttt{std::list} a C++ STL kétirányú láncolt listáját (Doubly Linked List) valósítja meg. Használata akkor javasolt, ha gyakori a beszúrás és törlés a tároló közepén, de ritka a véletlenszerű elérés.
+
+\subsection{Memória modell (Láncolt szerkezet)}
+
+A \texttt{list} memóriaképe alapvetően eltér a \texttt{vector}-étól és a \texttt{deque}-étól.
+
+\begin{itemize}
+    \item \textbf{Csomópontok (Nodes):} Minden elem egy önállóan, dinamikusan lefoglalt memóriablokkban (csomópontban) helyezkedik el.
+    \item \textbf{Szórt elhelyezkedés:} Az elemek nem egymás mellett vannak a memóriában, hanem "szétszórva" a heap-en.
+    \item \textbf{Belső szerkezet:} Minden csomópont három dolgot tárol:
+        \begin{enumerate}
+            \item Magát az adatot.
+            \item Egy mutatót az előző elemre (\textit{prev}).
+            \item Egy mutatót a következő elemre (\textit{next}).
+        \end{enumerate}
+    \item \textbf{Memória overhead:} Jelentős többletmemóriát igényel elemenként a két pointer miatt (pl. egy \texttt{char} tárolása esetén a pointerek mérete sokszorosa az adaténak).
+\end{itemize}
+
+
+
+\subsection{Bővíthetőség és Módosítás}
+
+Ez a \texttt{list} legnagyobb erőssége.
+
+\begin{itemize}
+    \item \textbf{Konstans idejű beszúrás/törlés ($O(1)$):} Bárhol (elején, végén, közepén) hozunk létre vagy törlünk elemet, az műveletigénye konstans (csak a pointereket kell átkötni).
+    \item \textbf{Nincs másolás:} Beszúráskor nem kell a többi elemet elmozgatni a memóriában.
+    \item \textbf{Iterátorok érvényessége:} Ez kritikus előny! Elem hozzáadása vagy törlése \textbf{soha nem érvényteleníti} a többi elemre mutató iterátorokat vagy pointereket (kivéve persze azt az egyet, amit épp törlünk).
+\end{itemize}
+
+\subsection{Bejárás és Elérés}
+
+A láncolt szerkezet hátránya a hozzáférés módjában jelentkezik.
+
+\begin{itemize}
+    \item \textbf{Nincs véletlen elérés (No Random Access):} Nem használható az \texttt{operator[]} vagy az \texttt{at()}. Nem lehet azt mondani, hogy "add ide az 5. elemet".
+    \item \textbf{Szekvenciális bejárás:} Egy elem eléréséhez végig kell lépkedni az összes előtte lévőn ($O(N)$).
+    \item \textbf{Kétirányú iterátor:} Csak \texttt{++} és \texttt{--} műveleteket támogat, aritmetikát (pl. \texttt{it + 5}) nem.
+    \item \textbf{Cache-barátságtalan:} Mivel az elemek szétszórva vannak a memóriában, a processzor cache-t nem tudja hatékonyan kihasználni (sok "cache miss"), így a bejárás lassabb lehet, mint egy vektornál.
+\end{itemize}
+
+\subsection{Példa a használatra}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <list>
+#include <algorithm>
+
+int main() {
+    std::list<int> l;
+
+    // 1. Feltöltés (O(1))
+    l.push_back(10);
+    l.push_front(5);
+    l.push_back(20); // Lista: 5 <-> 10 <-> 20
+
+    // 2. Beszúrás középre
+    // Megkeressük a 10-es elemet (ez lassú, O(N))
+    auto it = std::find(l.begin(), l.end(), 10);
+    
+    // Beszúrjuk elé a 7-est (ez gyors, O(1))
+    if (it != l.end()) {
+        l.insert(it, 7); 
+    }
+    // Lista: 5 <-> 7 <-> 10 <-> 20
+
+    // 3. Bejárás
+    // Nincs l[2], csak iterátoros bejárás
+    std::cout << "Lista elemei: ";
+    for (int x : l) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // 4. splice: Lista darabok átmozgatása (speciális lista művelet)
+    // Egy másik lista tartalmát átfűzi ide másolás nélkül O(1)
+    std::list<int> l2 = {100, 200};
+    l.splice(l.begin(), l2); 
+    
+    return 0;
+}
+\end{minted}

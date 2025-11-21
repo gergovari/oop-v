@@ -1,0 +1,83 @@
+\section{Ismertesse az STL iterátorok működését és feladatát egy lista STL tároló esetén!}
+
+Az iterátorok az STL (Standard Template Library) „ragasztóanyagai”, amelyek egységes felületet biztosítanak a különböző tárolók (konténerek) bejárására anélkül, hogy a programozónak ismernie kellene a tároló belső memóriaszerkezetét.
+
+\subsection{Az iterátor feladata és fogalma}
+
+\begin{itemize}
+    \item \textbf{Absztrakció:} Az iterátor egy általánosított mutató (smart pointer). Úgy viselkedik, mint egy pointer, de a háttérben elrejti a bonyolult léptetési logikát.
+    \item \textbf{Egységes interfész:} Lehetővé teszi, hogy ugyanazt az algoritmust (pl. \texttt{std::find}, \texttt{std::sort}) használhassuk vektoron, listán vagy set-en, mivel az algoritmus nem a tárolót, hanem annak iterátorait használja.
+    \item \textbf{Kapcsolat:} A \texttt{begin()} (első elemre mutató) és \texttt{end()} (utolsó utáni elemre mutató) tagfüggvényekkel kérhetők el.
+\end{itemize}
+
+\subsection{Működés std::list esetén (Láncolt lista)}
+
+Mivel az \texttt{std::list} elemei a memóriában szétszórtan helyezkednek el (csomópontokban), az iterátor működése eltér a vektorétól:
+
+\begin{itemize}
+    \item \textbf{Belső szerkezet:} A lista iterátora a háttérben egy mutatót tárol az aktuális \textit{csomópontra} (node).
+    \item \textbf{Léptetés (\texttt{++it}):} Amikor az iterátort növeljük, az nem a memóriacímet növeli (mint egy tömbnél), hanem a csomópont \texttt{next} pointerét követi: \\
+    \texttt{current = current->next;}
+    \item \textbf{Dereferálás (\texttt{*it}):} A \texttt{*} operátor az aktuális csomópontban tárolt \textit{adatot} adja vissza.
+\end{itemize}
+
+\subsection{Az iterátor kategóriája: Kétirányú (Bidirectional)}
+
+A láncolt lista szerkezete miatt a lista iterátora korlátozottabb, mint a vektoré:
+
+\begin{itemize}
+    \item \textbf{Amit TUD:}
+        \begin{itemize}
+            \item Előre lépni (\texttt{++it}).
+            \item Hátra lépni (\texttt{--it}).
+            \item Egyenlőséget vizsgálni (\texttt{it1 == it2}).
+        \end{itemize}
+    \item \textbf{Amit NEM TUD (No Random Access):}
+        \begin{itemize}
+            \item Nem lehet tetszőlegeset ugrani (\texttt{it + 5} \textbf{tilos}).
+            \item Nem lehet indexelni (\texttt{it[3]} \textbf{tilos}).
+            \item Nem lehet a távolságot egyszerű kivonással megkapni (\texttt{it2 - it1} \textbf{tilos}).
+        \end{itemize}
+\end{itemize}
+
+\subsection{Iterátor érvényesség (Iterator Validity)}
+
+A lista egyik legnagyobb előnye az iterátorok stabilitása:
+
+\begin{itemize}
+    \item \textbf{Beszúráskor:} Egyik létező iterátor sem válik érvénytelenné (mivel a meglévő csomópontok nem mozdulnak el a memóriában).
+    \item \textbf{Törléskor:} Csak az az egy iterátor válik érvénytelenné, amelyik a törölt elemre mutatott. A többi továbbra is használható.
+\end{itemize}
+
+\subsection{Példa a használatra}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <list>
+#include <algorithm> // std::advance miatt
+
+int main() {
+    std::list<int> l = {10, 20, 30, 40};
+
+    // 1. Iterátor lekérése
+    std::list<int>::iterator it = l.begin();
+
+    // 2. Bejárás és módosítás
+    while (it != l.end()) {
+        *it += 1; // Dereferálás: érték módosítása
+        std::cout << *it << " ";
+        it++;     // Léptetés (next pointer követése)
+    }
+    
+    // 3. Ugrás (Mivel nincs Random Access, ez trükkös)
+    it = l.begin();
+    // it = it + 2; // HIBA! Ez listánál nem működik!
+    
+    // Helyette lépésenként kell haladni (vagy segédfüggvénnyel):
+    std::advance(it, 2); // O(N) idejű léptetés a háttérben
+    
+    std::cout << "\nHarmadik elem: " << *it << std::endl; // 31
+
+    return 0;
+}
+\end{minted}

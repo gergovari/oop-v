@@ -1,0 +1,79 @@
+\section{Ismertesse az „adatrejtés” objektum-orientált elvet!}
+
+\subsection{Fogalma és Lényege}
+\begin{itemize}
+    \item \textbf{Definíció:} Az adatrejtés (Data Hiding) az a technika, amellyel az objektum belső állapotát (adattagjait) elzárjuk a külvilág elől.
+    \item \textbf{Cél:} Megakadályozni, hogy más programrészek véletlenül vagy szándékosan, ellenőrizetlenül módosítsák az objektum adatait.
+    \item \textbf{Interfész és Implementáció szétválasztása:}
+    \begin{itemize}
+        \item \textbf{Implementáció (Privát):} A belső működés részletei és az adatok tárolása. Ez kívülről láthatatlan.
+        \item \textbf{Interfész (Publikus):} Azok a metódusok (függvények), amelyeken keresztül kommunikálni lehet az objektummal.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Megvalósítás C++ nyelven}
+A hozzáférési szinteket (access specifiers) használjuk a láthatóság szabályozására:
+
+\begin{enumerate}
+    \item \textbf{\texttt{private} (Privát):}
+    \begin{itemize}
+        \item Az osztály alapértelmezett hozzáférése (class esetén).
+        \item Csak az osztály saját metódusai férnek hozzá.
+        \item \textbf{Ide helyezzük az adattagokat.}
+    \end{itemize}
+    \item \textbf{\texttt{public} (Nyilvános):}
+    \begin{itemize}
+        \item Bárhonnan elérhető.
+        \item \textbf{Ide helyezzük a Getter/Setter metódusokat}, amelyek ellenőrzött hozzáférést biztosítanak a privát adatokhoz.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Miért fontos? (Előnyök)}
+\begin{itemize}
+    \item \textbf{Érvényesség (Validáció):} A Setter metódusokban megvizsgálhatjuk a kapott értéket. Ha érvénytelen (pl. negatív életkor), megakadályozhatjuk a beállítást.
+    \item \textbf{Karbantarthatóság:} Ha megváltoztatjuk az adattárolás belső módját (pl. \texttt{int} helyett \texttt{long} vagy adatbázisból jön), a külvilágnak nem kell erről tudnia, amíg a publikus metódusok ugyanúgy hívhatók.
+    \item \textbf{Csak olvashatóság:} Ha egy adathoz írunk Gettert, de Settert nem, akkor az adat kívülről "read-only" (csak olvasható) lesz.
+\end{itemize}
+
+\subsection{Példa: Ellenőrzött hozzáférés}
+A példában a `Diak` osztály osztályzatait rejtjük el. Csak 1 és 5 közötti értéket engedünk beállítani.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class Diak {
+private:
+    // REJTETT ADAT: Kívülről közvetlenül nem érhető el.
+    int jegy; 
+
+public:
+    // Konstruktor
+    Diak() : jegy(1) {}
+
+    // SETTER (Beállító) - Validációval
+    // Ez az "ajtó", amin keresztül módosítani lehet az adatot.
+    void setJegy(int ujJegy) {
+        if (ujJegy >= 1 && ujJegy <= 5) {
+            jegy = ujJegy;
+        } else {
+            // Érvénytelen adat elutasítása
+            // (Itt lehetne hibaüzenetet dobni vagy logolni)
+        }
+    }
+
+    // GETTER (Lekérdező)
+    // Ez biztosítja, hogy az adat olvasható legyen.
+    int getJegy() const {
+        return jegy;
+    }
+};
+
+int main() {
+    Diak d;
+    
+    // d.jegy = 6;  // -> FORDÍTÁSI HIBA: 'jegy' private!
+
+    d.setJegy(4);   // Működik: érvényes adat
+    d.setJegy(8);   // Nem történik semmi: érvénytelen adat, a védelem működik
+    
+    return 0;
+}
+\end{minted}

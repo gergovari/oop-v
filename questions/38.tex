@@ -1,0 +1,102 @@
+\section{Ismertesse az „öröklődés” elvet osztályok egymásba ágyazására! Mi az öröklődés szintaktikája a C++-ban?}
+
+Az öröklődés (inheritance) az objektumorientált programozás egyik legfontosabb pillére, amely lehetővé teszi, hogy egy meglévő osztályból (ős) új osztályt (utód) hozzunk létre, átvéve annak tulajdonságait és viselkedését.
+
+\subsection{Az elv és a kapcsolat típusa}
+
+\begin{itemize}
+    \item \textbf{„Is-a” kapcsolat:} Az öröklődés a „van egy” (típusú) kapcsolatot valósítja meg. Például: a „Kutya” \textit{egy} „Állat”. (Eltér a kompozíció „has-a” kapcsolatától).
+    \item \textbf{Hierarchia:}
+        \begin{itemize}
+            \item \textbf{Bázisosztály (Base class):} Az ős, amely az általános tulajdonságokat tartalmazza.
+            \item \textbf{Származtatott osztály (Derived class):} Az utód, amely örökli az őst, és specifikus tulajdonságokkal/metódusokkal egészíti ki vagy módosítja azt.
+        \end{itemize}
+    \item \textbf{Kódújrafelhasználás:} A közös logikát elég egyszer, az ősben megírni, az utódok automatikusan megkapják.
+\end{itemize}
+
+\subsection{Szintaktika C++ nyelven}
+
+Az öröklést az osztály definíciójakor, a név után kettősponttal adjuk meg.
+
+\begin{minted}{cpp}
+class Szarmaztatott : [hozzaferes] BazisOsztaly {
+    // A származtatott osztály törzse
+};
+\end{minted}
+
+Ahol a \texttt{[hozzaferes]} a származtatás módja lehet: \texttt{public}, \texttt{protected} vagy \texttt{private}.
+
+\subsection{Származtatási módok (Láthatóság)}
+
+A származtatási mód határozza meg, hogy az örökölt tagok hogyan látszanak az utódban:
+
+\begin{itemize}
+    \item \textbf{\texttt{public} (Leggyakoribb):}
+        \begin{itemize}
+            \item Az ős \texttt{public} tagjai \texttt{public} maradnak.
+            \item Az ős \texttt{protected} tagjai \texttt{protected} maradnak.
+            \item Az ős \texttt{private} tagjai nem érhetők el közvetlenül.
+            \item \textit{Jelentése:} Az utód teljes mértékben helyettesítheti az őst (interfész öröklés).
+        \end{itemize}
+    \item \textbf{\texttt{protected}:}
+        \begin{itemize}
+            \item Az ős \texttt{public} és \texttt{protected} tagjai \texttt{protected} elérésűvé válnak az utódban.
+        \end{itemize}
+    \item \textbf{\texttt{private}:}
+        \begin{itemize}
+            \item Minden örökölt tag \texttt{private} lesz az utódban. Ez inkább implementációs öröklés (hasonlít a kompozícióhoz).
+        \end{itemize}
+\end{itemize}
+
+\subsection{Konstruktorok és Destruktorok sorrendje}
+
+Az öröklődés során a létrejövés és megszűnés sorrendje szigorúan kötött:
+
+\begin{enumerate}
+    \item \textbf{Létrehozás (Konstruktor):} Először a \textbf{Bázisosztály} konstruktora fut le (hogy az alapok készen álljanak), utána a \textbf{Származtatott} osztályé.
+    \item \textbf{Megszűnés (Destruktor):} Fordított sorrendben történik. Először a \textbf{Származtatott} osztály takarít, végül a \textbf{Bázisosztály}.
+\end{enumerate}
+
+\textit{Megjegyzés:} Ha az ősnek van paraméteres konstruktora, azt az utód \textit{Member Initializer List}-jében (taginicializáló lista) kell meghívni.
+
+\subsection{Példa}
+
+\begin{minted}{cpp}
+#include <iostream>
+
+// Bázisosztály
+class Allat {
+protected:
+    int labakSzama; // Protected: utód látja, külvilág nem
+
+public:
+    Allat(int lab) : labakSzama(lab) {
+        std::cout << "Allat letrejott." << std::endl;
+    }
+    
+    void eszik() {
+        std::cout << "Az allat eszik." << std::endl;
+    }
+};
+
+// Származtatott osztály (Public öröklés)
+class Kutya : public Allat {
+public:
+    // Az ős konstruktorát hívjuk az inicializáló listán
+    Kutya() : Allat(4) { 
+        std::cout << "Kutya letrejott." << std::endl;
+    }
+
+    void ugat() {
+        // Hozzáférünk a protected taghoz
+        std::cout << "Vau! Labaim szama: " << labakSzama << std::endl;
+    }
+};
+
+int main() {
+    Kutya bodri;      // 1. Allat ctor, 2. Kutya ctor
+    bodri.eszik();    // Örökölt metódus
+    bodri.ugat();     // Saját metódus
+    return 0;         // Destruktorok: 1. Kutya dtor, 2. Allat dtor
+}
+\end{minted}

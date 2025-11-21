@@ -1,0 +1,75 @@
+\section{Ismertesse a „sokalakúság” objektum-orientált elvet!}
+
+\subsection{Fogalma és Lényege}
+\begin{itemize}
+    \item \textbf{Definíció:} A sokalakúság (Polimorfizmus) lehetővé teszi, hogy különböző típusú objektumokat (amelyek egy közös ősosztályból származnak) egységes módon kezeljünk.
+    \item \textbf{Egy interfész, több megvalósítás:} Ugyanaz a függvényhívás más és más viselkedést vált ki attól függően, hogy valójában milyen típusú objektum áll a háttérben.
+    \item \textbf{Dinamikus kötés (Dynamic Binding):} A fordító nem fordítási időben, hanem futásidőben dönti el, melyik függvényt kell meghívni.
+\end{itemize}
+
+\subsection{Technikai megvalósítás C++-ban}
+A futásidejű polimorfizmushoz három feltétel szükséges:
+\begin{enumerate}
+    \item \textbf{Öröklődés:} Legyen egy közös ősosztály.
+    \item \textbf{Virtuális függvények (\texttt{virtual}):} Az ősosztályban a felüldefiniálandó metódusokat \texttt{virtual} kulcsszóval kell ellátni.
+    \item \textbf{Pointer vagy Referencia:} Az objektumokat az ősosztályra mutató pointeren vagy referencián keresztül kell meghívni.
+\end{enumerate}
+
+\subsection{A virtuális destruktor fontossága}
+Ha egy osztályban van virtuális függvény, a destruktornak is \textbf{virtuálisnak kell lennie} (\texttt{virtual \~Os()}).
+\begin{itemize}
+    \item \textit{Ok:} Ha az ősosztály pointerén keresztül törlünk (\texttt{delete}) egy objektumot, csak így garantálható, hogy a leszármazott osztály destruktora is lefusson és felszabadítsa a memóriát.
+\end{itemize}
+
+\subsection{Példa: Állathangok}
+Ebben a példában a \texttt{main} függvény nem tudja (és nem is érdekli), hogy konkrétan milyen állatot kapott, csak azt tudja, hogy az egy \texttt{Allat}, és képes hangot adni.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+// ŐSOSZTÁLY
+class Allat {
+public:
+    // Virtuális függvény: a leszármazottak felülírhatják
+    virtual void hangotAd() {
+        std::cout << "..." << std::endl;
+    }
+
+    // Virtuális destruktor: kötelező polimorfizmusnál!
+    virtual ~Allat() {}
+};
+
+// LESZÁRMAZOTT 1
+class Kutya : public Allat {
+public:
+    // 'override': jelzi, hogy szándékosan írjuk felül az őst
+    void hangotAd() override {
+        std::cout << "Vau!" << std::endl;
+    }
+};
+
+// LESZÁRMAZOTT 2
+class Macska : public Allat {
+public:
+    void hangotAd() override {
+        std::cout << "Miau!" << std::endl;
+    }
+};
+
+int main() {
+    // Polimorfizmus használata: 
+    // Ős típusú pointer mutat a leszármazottra
+    Allat* bodri = new Kutya();
+    Allat* cirmi = new Macska();
+
+    // Ugyanaz a függvényhívás, eltérő viselkedés
+    bodri->hangotAd(); // Kiírja: Vau!
+    cirmi->hangotAd(); // Kiírja: Miau!
+
+    // Takarítás
+    delete bodri;
+    delete cirmi;
+    
+    return 0;
+}
+\end{minted}

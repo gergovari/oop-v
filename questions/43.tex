@@ -1,0 +1,103 @@
+\section{Ismertesse a C++-ban található „többszörös öröklődés” elvet! Az ismertetést ábrával és program-részlettel illusztrálja!}
+
+A többszörös öröklődés (Multiple Inheritance) azt a mechanizmust jelenti, amikor egy származtatott osztálynak \textbf{egynél több közvetlen ősosztálya} van. Ekkor az utód az összes felsorolt ős tulajdonságait (adattagjait és metódusait) egyesíti magában.
+
+\subsection{Alapvető szabályok}
+
+\begin{itemize}
+    \item \textbf{Szintaxis:} Az osztály definíciójában vesszővel elválasztva soroljuk fel az ősöket, mindegyiknél külön megadva a láthatóságot (pl. \texttt{public}).
+    \item \textbf{Konstruktorok sorrendje:} Az ősök konstruktorai a \textit{deklarációban felsorolt sorrendben} futnak le (nem az inicializáló lista sorrendje számít!).
+    \item \textbf{Destruktorok sorrendje:} A konstruktorokkal ellentétes (fordított) sorrendben.
+\end{itemize}
+
+\subsection{Strukturális Ábra}
+
+Az alábbi ábra a \textit{Kamera} és \textit{Telefon} osztályok egyesítését mutatja egy \textit{Okostelefon} osztályban.
+
+\begin{verbatim}
+      +-----------+       +-----------+
+      |  Kamera   |       |  Telefon  |
+      +-----------+       +-----------+
+      | fotoz()   |       | hív()     |
+      +-----+-----+       +-----+-----+
+            ^                   ^
+            |                   |
+            +---------+---------+
+                      |
+              +-------+-------+
+              |  Okostelefon  |
+              +---------------+
+              | internetez()  |
+              +---------------+
+\end{verbatim}
+
+\subsection{Problémák és megoldások}
+
+\begin{itemize}
+    \item \textbf{Névütközés (Ambiguity):} Ha két ősosztályban azonos nevű függvény van, a fordító nem tudja, melyiket hívja.
+        \begin{itemize}
+            \item \textit{Megoldás:} Scope feloldó operátor használata: \texttt{obj.Os1::fgv()}.
+        \end{itemize}
+    \item \textbf{Rombusz-probléma (Diamond Problem):} Ha két ősosztálynak (B és C) van egy közös őse (A), akkor a végső utódban (D) az 'A' adattagjai duplán jelennének meg.
+        \begin{itemize}
+            \item \textit{Megoldás:} \textbf{Virtual inheritance} (\texttt{virtual public Base}). Így csak egyetlen példány jön létre a közös ősből.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Példa program}
+
+Az alábbi példa bemutatja két független osztály egyesítését és a névütközés feloldását.
+
+\begin{minted}{cpp}
+#include <iostream>
+
+// 1. Ősosztály
+class Kamera {
+public:
+    void fotoz() { 
+        std::cout << "Katt!" << std::endl; 
+    }
+    
+    void bekapcsol() { // Névütközés forrása lesz
+        std::cout << "Kamera be." << std::endl;
+    }
+};
+
+// 2. Ősosztály
+class Telefon {
+public:
+    void hiv() { 
+        std::cout << "Hivas inditasa..." << std::endl; 
+    }
+    
+    void bekapcsol() { // Névütközés forrása lesz
+        std::cout << "Telefon be." << std::endl;
+    }
+};
+
+// Származtatott osztály: mindkettőből örököl
+class Okostelefon : public Kamera, public Telefon {
+public:
+    void internetez() {
+        std::cout << "Bongeszes..." << std::endl;
+    }
+};
+
+int main() {
+    Okostelefon mobil;
+
+    // Egyedi funkciók elérése gond nélkül
+    mobil.fotoz();
+    mobil.hiv();
+    mobil.internetez();
+
+    // Névütközés kezelése
+    // mobil.bekapcsol(); // HIBA: "ambiguous" (kétértelmű)
+    
+    // Helyes hívás scope feloldással:
+    mobil.Kamera::bekapcsol(); 
+    mobil.Telefon::bekapcsol();
+
+    return 0;
+}
+\end{minted}

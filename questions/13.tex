@@ -1,0 +1,82 @@
+\section{Ismertesse a „this” pointer alkalmazását a fordító és a felhasználó szemszögéből!}
+
+\subsection{Fogalma}
+\begin{itemize}
+    \item \textbf{Definíció:} A \texttt{this} egy speciális, konstans pointer, amely minden \textbf{nem statikus} tagfüggvényben (metódusban) automatikusan elérhető.
+    \item \textbf{Hova mutat?} Mindig arra a konkrét objektumpéldányra mutat, amelyre az adott tagfüggvényt meghívták.
+    \item \textbf{Típusa:} \texttt{OsztalyTipus* const} (maga a pointer nem változtatható meg, hogy más objektumra mutasson).
+\end{itemize}
+
+\subsection{1. A Fordító szemszögéből (Implementáció)}
+A felhasználó számára a tagfüggvény hívása egyszerűnek tűnik (\texttt{obj.fv()}), de a háttérben a fordító átalakítja azt.
+
+\begin{itemize}
+    \item \textbf{Rejtett paraméter:} A fordító minden tagfüggvényhez hozzáad egy láthatatlan, első paramétert: a \texttt{this} pointert.
+    \item \textbf{Hívás átalakítása:} Amikor meghívunk egy metódust, a fordító átadja az objektum memóriacímét ennek a rejtett paraméternek.
+\end{itemize}
+
+\textit{Sematikus szemléltetés:}
+\begin{itemize}
+    \item \textbf{Amit mi írunk:} \texttt{obj.setAdat(5);}
+    \item \textbf{Amit a fordító lát:} \texttt{setAdat(\&obj, 5);}
+\end{itemize}
+
+\subsection{2. A Felhasználó (Programozó) szemszögéből}
+Programozóként a \texttt{this}-t explicit módon kell használnunk bizonyos esetekben:
+
+\begin{enumerate}
+    \item \textbf{Névütközés feloldása (Shadowing):}
+    Ha a paraméter neve megegyezik az adattag nevével, a \texttt{this->} előtaggal hivatkozhatunk az osztály adattagjára.
+    
+    \item \textbf{Metódusláncolás (Method Chaining):}
+    Ha egy függvény a \texttt{*this} (az objektum dereferált értéke) referenciájával tér vissza, akkor több függvényhívás fűzhető egymás után (pl. \texttt{cout} vagy Builder minta).
+    
+    \item \textbf{Ön-hivatkozás ellenőrzése:}
+    Értékadó operátor (\texttt{operator=}) írásakor ellenőrizni kell, hogy nem önmagával egyenlővé tesszük-e az objektumot (\texttt{if (this == \&other)}).
+\end{enumerate}
+
+\subsection{Kódpélda a felhasználási esetekre}
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Szamolo {
+private:
+    int ertek;
+
+public:
+    Szamolo() : ertek(0) {}
+
+    // 1. Névütközés kezelése
+    // A paraméter neve 'ertek', ami eltakarja az adattagot.
+    // A 'this->ertek' jelenti az osztály változóját.
+    void setErtek(int ertek) {
+        this->ertek = ertek; 
+    }
+
+    // 2. Láncolhatóság
+    // A függvény visszatér az aktuális objektum referenciájával (*this).
+    Szamolo& hozzaad(int szam) {
+        this->ertek += szam;
+        return *this; // Visszaadjuk önmagunkat
+    }
+
+    void kiir() const {
+        std::cout << "Ertek: " << this->ertek << std::endl;
+    }
+};
+
+int main() {
+    Szamolo sz;
+    
+    // Láncolt hívás:
+    // 1. beállítjuk 10-re
+    // 2. hozzáadunk 5-öt (eredmény: 15)
+    // 3. hozzáadunk 2-t (eredmény: 17)
+    sz.setErtek(10);
+    sz.hozzaad(5).hozzaad(2); 
+
+    sz.kiir(); // 17
+    return 0;
+}
+\end{minted}

@@ -1,0 +1,82 @@
+\section{Ismertesse az osztálypéldányokon végzett műveletek definiálási lehetőségeit! Mely műveleteket nem lehet átdefiniálni?}
+
+\subsection{Az operátor-túlterhelés (Operator Overloading) lehetőségei}
+C++-ban az operátorok (pl. +, -, ==) új jelentést kaphatnak felhasználói típusok (osztályok) esetén. Két alapvető módon definiálhatjuk őket:
+
+\begin{enumerate}
+    \item \textbf{Tagfüggvényként (Member Function):}
+    \begin{itemize}
+        \item Az operátor az osztály része.
+        \item \textbf{Bal oldali operandus:} Implicit módon mindig az aktuális objektum (\texttt{*this}).
+        \item \textbf{Paraméterek száma:} Eggyel kevesebb, mint az operandusok száma (bináris operátornál 1 paraméter, unárisnál 0).
+        \item \textbf{Kötelező így írni:} \texttt{=}, \texttt{[]}, \texttt{()}, \texttt{->}.
+    \end{itemize}
+
+    \item \textbf{Globális (szabad) függvényként (Global Function):}
+    \begin{itemize}
+        \item Az osztályon kívül definiáljuk.
+        \item \textbf{Bal oldali operandus:} Az első paraméterként adjuk át (nincs \texttt{this}).
+        \item \textbf{Barát (friend) státusz:} Gyakran szükséges, hogy a függvény hozzáférjen a privát adattagokhoz.
+        \item \textbf{Előnye:} Lehetővé teszi a szimmetrikus konverziót (pl. \texttt{10 + obj} és \texttt{obj + 10} is működhet).
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Nem átdefiniálható operátorok}
+A nyelv védelme érdekében bizonyos operátorok működése rögzített, ezeket \textbf{tilos} túlterhelni:
+
+\begin{itemize}
+    \item \texttt{.} (Pont operátor / Tagkiválasztás)
+    \item \texttt{::} (Hatókör-feloldó / Scope resolution)
+    \item \texttt{?:} (Feltételes / Ternary operátor)
+    \item \texttt{sizeof} (Méret lekérdezése)
+    \item \texttt{typeid} (Típusinformáció)
+    \item \texttt{.*} (Tagra mutató pointer feloldása)
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja az összeadás (\texttt{+}) globális barátként, és az értékadás (\texttt{+=}) tagfüggvényként történő megvalósítását.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Vector2 {
+private:
+    int x, y;
+
+public:
+    Vector2(int x, int y) : x(x), y(y) {}
+
+    // 1. Tagfüggvényként definiált operátor (+=)
+    // A bal oldali operandus a 'this', a jobb oldali az 'other'
+    // Módosítja az objektum állapotát.
+    Vector2& operator+=(const Vector2& other) {
+        this->x += other.x;
+        this->y += other.y;
+        return *this; // Láncolhatóság miatt referenciával térünk vissza
+    }
+
+    // 2. Globális (Barát) függvényként definiált operátor (+)
+    // Két paramétert kap, új objektumot hoz létre.
+    friend Vector2 operator+(const Vector2& lhs, const Vector2& rhs);
+
+    void print() const { std::cout << x << "," << y << std::endl; }
+};
+
+// Globális definíció
+Vector2 operator+(const Vector2& lhs, const Vector2& rhs) {
+    // Nem módosítjuk a paramétereket, új példányt adunk vissza
+    return Vector2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
+int main() {
+    Vector2 v1(1, 2);
+    Vector2 v2(3, 4);
+
+    Vector2 v3 = v1 + v2; // Globális operator+ hívása
+    v1 += v2;             // Tagfüggvény operator+= hívása
+
+    v3.print(); // 4,6
+    v1.print(); // 4,6
+    return 0;
+}
+\end{minted}

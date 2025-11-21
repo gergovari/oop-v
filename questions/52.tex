@@ -1,0 +1,69 @@
+\section{Ismertesse a deque STL tároló tulajdonságait (memória modell, bejárás, bővíthetőség)!}
+
+Az \texttt{std::deque} (Double Ended Queue – kétvégű sor) az STL egyik speciális szekvenciális tárolója. Fő jellemzője, hogy a vektorral ellentétben nemcsak a végén, hanem az elején is hatékonyan bővíthető.
+
+\subsection{Memória modell (Szegmentált felépítés)}
+
+A \texttt{deque} legfontosabb tulajdonsága, hogy a memóriában \textbf{nem folytonosan} helyezkedik el (ellentétben a \texttt{vector}-ral).
+
+\begin{itemize}
+    \item \textbf{Blokkos szerkezet:} Az elemeket több, kisebb, fix méretű memóriablokkban (chunk/buffer) tárolja.
+    \item \textbf{Központi vezérlő (Map):} Egy belső "térképet" (pointerek tömbjét) tart fenn, amely ezekre a blokkokra mutat.
+    \item \textbf{Nincs pointer-kompatibilitás:} Mivel a memória nem folytonos, a \texttt{deque} elemei nem adhatók át közvetlenül olyan C-függvényeknek, amelyek nyers tömböt várnak (nincs \texttt{.data()} függvény, ami az egészet visszaadná).
+\end{itemize}
+
+
+
+\subsection{Bővíthetőség}
+
+A \texttt{deque} a dinamikus memóriakezelést a vektorhoz képest eltérő stratégiával valósítja meg:
+
+\begin{itemize}
+    \item \textbf{Kétirányú bővítés:} Támogatja a \texttt{push\_back()} és a \texttt{push\_front()} műveleteket is, mindkettő átlagos műveletigénye $O(1)$.
+    \item \textbf{Nincs teljes másolás:} Ha betelik a tárterület, nem kell az összes meglévő elemet új helyre másolni (mint a vektornál). Csak egy új memóriablokkot kell lefoglalni és hozzárendelni a központi térképhez.
+    \item \textbf{Referencia érvényesség:} Bővítéskor az elemek a memóriában a helyükön maradnak, így a rájuk mutató referenciák és pointerek érvényesek maradnak (bár az iterátorok érvénytelenné válhatnak, ha a központi map-et át kell szervezni).
+\end{itemize}
+
+\subsection{Bejárás és Elérés}
+
+A bonyolultabb belső szerkezet ellenére a \texttt{deque} kifelé hasonlóan viselkedik, mint a vektor.
+
+\begin{itemize}
+    \item \textbf{Véletlen elérés (Random Access):} Támogatja az indexelést (\texttt{operator[]} és \texttt{at()}) $O(1)$ időben.
+        \begin{itemize}
+            \item \textit{Megjegyzés:} Ez valamivel lassabb, mint a vektor indexelése, mivel két lépcsőben történik (először a megfelelő blokk kikeresése, majd azon belül az elem elérése).
+        \end{itemize}
+    \item \textbf{Iterátorok:} Random Access Iteratort biztosít, tehát lehet vele ugrani (\texttt{it + 5}), de az iterátor implementációja bonyolultabb ("smart pointer"), mert tudnia kell ugrani a memóriablokkok határain.
+\end{itemize}
+
+\subsection{Példa a használatra}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <deque>
+
+int main() {
+    std::deque<int> d;
+
+    // 1. Bővítés a végén (mint a vector)
+    d.push_back(10);
+    d.push_back(20);
+
+    // 2. Bővítés az elején (ez a vectornál O(N) lenne, itt O(1))
+    d.push_front(5);
+    d.push_front(1);
+
+    // Memória logika: [1, 5] (egy blokkban) ... [10, 20] (másik blokkban)
+    // De számunkra folytonosnak látszik: 1, 5, 10, 20
+
+    // 3. Véletlen elérés
+    std::cout << "3. elem: " << d[2] << std::endl; // Kiírja: 10
+
+    // 4. Bejárás
+    for (int n : d) {
+        std::cout << n << " ";
+    }
+    
+    return 0;
+}
+\end{minted}

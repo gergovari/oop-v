@@ -1,0 +1,65 @@
+\section{Ismertesse a C++ nyelvben a template-ek működését függvény és osztály definiálása során! Írjon példán template-tel deklarált függvényre és használatára!}
+
+\subsection{Fogalma és Célja}
+\begin{itemize}
+    \item \textbf{Generikus programozás:} A template-ek (sablonok) teszik lehetővé a C++-ban a típusfüggetlen kódírást.
+    \item \textbf{Cél:} Olyan algoritmusok vagy adatszerkezetek írása, amelyeket egyszer definiálunk, de különféle adattípusokkal (pl. \texttt{int}, \texttt{double}, saját objektum) is működnek.
+    \item \textbf{"Tervrajz":} A template nem egy kész függvény vagy osztály, hanem egy minta, amiből a fordító generálja le a tényleges kódot.
+\end{itemize}
+
+\subsection{Működési Mechanizmus}
+\begin{itemize}
+    \item \textbf{Fordítási idő (Compile-time):} A template kiértékelése fordítási időben történik.
+    \item \textbf{Példányosítás (Instantiation):} Amikor a sablont egy konkrét típussal használjuk, a fordító létrehoz (generál) belőle egy dedikált verziót az adott típusra.
+    \item \textbf{Kulcsszavak:} A \texttt{template} kulcsszóval vezetjük be, utána csúcsos zárójelben adjuk meg a típusparamétereket (pl. \texttt{<typename T>} vagy \texttt{<class T>}). A kettő jelentése ebben a kontextusban megegyezik.
+\end{itemize}
+
+\subsection{Függvény és Osztály definiálása}
+
+\subsubsection{1. Függvény Template}
+\begin{itemize}
+    \item Olyan függvény, amelynek paraméterei vagy visszatérési értéke általános típusú.
+    \item \textbf{Típuslevezetés (Type Deduction):} Híváskor a fordító általában automatikusan kitalálja a típust az átadott argumentumokból (nem kötelező kiírni, hogy \texttt{<int>}).
+\end{itemize}
+
+\subsubsection{2. Osztály Template}
+\begin{itemize}
+    \item Olyan osztály, ahol az adattagok típusa típusparaméterként van megadva.
+    \item \textbf{Használat:} Tipikus példák a tárolók (konténerek), pl. \texttt{std::vector} vagy \texttt{std::list}.
+    \item \textbf{Explicit megadás:} Objektum létrehozásakor régebbi C++ szabványokban kötelező, újabbakban (C++17 óta) ajánlott megadni a típust (pl. \texttt{Osztaly<int> obj;}).
+\end{itemize}
+
+\subsection{Példa: Függvény template használata}
+Az alábbi példa egy maximum-kiválasztó függvényt mutat be, amely bármilyen összehasonlítható típussal működik.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+#include <string>
+
+// --- Sablon definíciója ---
+// T: helyettesítő típusparaméter
+template <typename T>
+T maximum(T a, T b) {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+int main() {
+    // 1. Használat egész számokkal (automatikus típuslevezetés: int)
+    int x = 10, y = 20;
+    std::cout << "Max int: " << maximum(x, y) << std::endl;
+
+    // 2. Használat lebegőpontos számokkal (automatikus: double)
+    double d1 = 5.5, d2 = 2.3;
+    std::cout << "Max double: " << maximum(d1, d2) << std::endl;
+
+    // 3. Használat explicit típusmegadással
+    // Hasznos, ha a paraméterek típusa eltérne, de kényszeríteni akarjuk
+    std::cout << "Explicit: " << maximum<double>(5, 6.7) << std::endl;
+
+    return 0;
+}
+\end{minted}

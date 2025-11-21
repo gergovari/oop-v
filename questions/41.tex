@@ -1,0 +1,118 @@
+\section{Ismertesse az ősben található osztálytagok elérésének módosítását private és protected öröklődés során!}
+
+C++-ban az öröklődés típusa (hozzáférési módosítója) szabályozza, hogy az ősosztály tagjai milyen láthatósággal jelenjenek meg a származtatott osztályban. Általános szabály, hogy az öröklés soha nem tágítja, csak szűkítheti (vagy szinten tarthatja) a láthatóságot.
+
+\subsection{Az alapvető mechanizmus}
+
+A végső elérési szintet a „legszigorúbb szabály” elve határozza meg:
+$$ \text{Új láthatóság} = \max(\text{Eredeti láthatóság}, \text{Öröklés típusa}) $$
+Ahol a szigorúsági sorrend: \texttt{private} > \texttt{protected} > \texttt{public}.
+Az ős \texttt{private} tagjai soha nem érhetők el közvetlenül a származtatott osztályból, függetlenül az öröklés típusától.
+
+\subsection{Protected (Védett) öröklődés}
+
+Ha \texttt{class Derived : protected Base} formában származtatunk:
+
+\begin{itemize}
+    \item \textbf{Hatása:}
+        \begin{itemize}
+            \item Az ős \textbf{public} tagjai $\rightarrow$ \textbf{protected} tagokká válnak az utódban.
+            \item Az ős \textbf{protected} tagjai $\rightarrow$ \textbf{protected} tagok maradnak.
+            \item Az ős \textbf{private} tagjai $\rightarrow$ elérhetetlenek maradnak.
+        \end{itemize}
+    \item \textbf{Következmény:}
+        \begin{itemize}
+            \item A külvilág (pl. \texttt{main} függvény) számára az összes örökölt tag elérhetetlenné válik (mivel védettek lettek).
+            \item A további leszármazottak (az unokák) viszont még hozzáférhetnek ezekhez a tagokhoz (mivel protected státuszúak).
+        \end{itemize}
+\end{itemize}
+
+\subsection{Private (Privát) öröklődés}
+
+Ha \texttt{class Derived : private Base} formában származtatunk (vagy elhagyjuk a kulcsszót \texttt{class} esetén):
+
+\begin{itemize}
+    \item \textbf{Hatása:}
+        \begin{itemize}
+            \item Az ős \textbf{public} tagjai $\rightarrow$ \textbf{private} tagokká válnak az utódban.
+            \item Az ős \textbf{protected} tagjai $\rightarrow$ \textbf{private} tagokká válnak az utódban.
+            \item Az ős \textbf{private} tagjai $\rightarrow$ elérhetetlenek maradnak.
+        \end{itemize}
+    \item \textbf{Következmény:}
+        \begin{itemize}
+            \item A külvilág számára minden el van rejtve.
+            \item A további leszármazottak (unokák) már semmit sem látnak az ősosztályból (mivel itt a lánc megszakad a priváttá tétel miatt).
+            \item Ez gyakorlatilag implementációs öröklés (hasonló a kompozícióhoz).
+        \end{itemize}
+\end{itemize}
+
+\subsection{Összefoglaló táblázat}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+    \textbf{Ős tagja} & \textbf{Public öröklés} & \textbf{Protected öröklés} & \textbf{Private öröklés} \\ \hline
+    \texttt{public} & \texttt{public} & \texttt{protected} & \texttt{private} \\ \hline
+    \texttt{protected} & \texttt{protected} & \texttt{protected} & \texttt{private} \\ \hline
+    \texttt{private} & \textit{Elérhetetlen} & \textit{Elérhetetlen} & \textit{Elérhetetlen} \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Láthatóság visszaállítása (Using declaration)}
+
+Privát vagy védett öröklés esetén is visszaállítható egyes tagok láthatósága a \texttt{public} szintre a \texttt{using} kulcsszóval.
+
+\begin{minted}{cpp}
+class Base {
+public:
+    void fgv() {}
+    int adat;
+};
+
+class Derived : private Base {
+public:
+    // Kivétel: ezt az egy tagot publikussá tesszük
+    using Base::fgv; 
+    // Az 'adat' továbbra is private marad
+};
+\end{minted}
+
+\subsection{Példa a korlátozásokra}
+
+\begin{minted}{cpp}
+class Base {
+public:    int pub;
+protected: int prot;
+private:   int priv;
+};
+
+// 1. Protected öröklés
+class ProtDerived : protected Base {
+    void teszt() {
+        pub = 1;  // OK (itt protected)
+        prot = 2; // OK (itt protected)
+        // priv = 3; // HIBA: ős privátja nem érhető el
+    }
+};
+
+// 2. Private öröklés
+class PrivDerived : private Base {
+    void teszt() {
+        pub = 1;  // OK (itt private)
+        prot = 2; // OK (itt private)
+    }
+};
+
+class Unoka : public PrivDerived {
+    void teszt() {
+        // pub = 1; // HIBA! A PrivDerived-ben ez már private lett!
+    }
+};
+
+int main() {
+    ProtDerived pd;
+    // pd.pub = 1; // HIBA! Kívülről protected, nem látszik.
+    return 0;
+}
+\end{minted}

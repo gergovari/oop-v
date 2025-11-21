@@ -1,0 +1,78 @@
+\section{Ismertesse az „egységbe zárás” objektum-orientált elvet!}
+
+\subsection{Fogalma és Lényege}
+\begin{itemize}
+    \item \textbf{Definíció:} Az egységbe zárás (Encapsulation) az adatoknak (tulajdonságok) és az azokon műveleteket végző függvényeknek (metódusok) egyetlen egységben, azaz \textbf{osztályban} történő összefogása.
+    \item \textbf{Adatrejtés (Data Hiding):} Az objektum belső állapotát (adattagjait) elrejtjük a külvilág elől. Ezeket közvetlenül nem, csak ellenőrzött felületen keresztül lehet módosítani.
+    \item \textbf{Black Box elv:} Az osztályt használó programozónak csak azt kell tudnia, \textit{mit} csinál az objektum (publikus interfész), azt nem, hogy \textit{hogyan} valósítja meg azt (implementáció).
+\end{itemize}
+
+\subsection{Megvalósítás C++ nyelven}
+A hozzáférés szabályozása az úgynevezett hozzáférési módosítókkal (access modifiers) történik:
+
+\begin{enumerate}
+    \item \textbf{\texttt{private} (Privát):}
+    \begin{itemize}
+        \item Csak az osztály saját metódusai (és a barát osztályok) férnek hozzá.
+        \item \textbf{Szabály:} Az adattagokat szinte mindig ide rakjuk a védelem érdekében.
+    \end{itemize}
+    
+    \item \textbf{\texttt{public} (Nyilvános):}
+    \begin{itemize}
+        \item Bárhonnan elérhető.
+        \item \textbf{Szabály:} Azok a metódusok kerülnek ide, amelyeket a külvilág számára biztosítunk (interfész).
+    \end{itemize}
+    
+    \item \textbf{\texttt{protected} (Védett):}
+    \begin{itemize}
+        \item Kívülről nem látható (mint a private), de az öröklés során a leszármazott osztályok hozzáférhetnek.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Az egységbe zárás előnyei}
+\begin{itemize}
+    \item \textbf{Adatintegritás (Validáció):} A Setter metódusokban ellenőrizhetjük a bemenő adatokat (pl. egy életkor nem lehet negatív), így az objektum nem kerülhet érvénytelen állapotba.
+    \item \textbf{Rugalmasság:} A belső implementáció (pl. az adattárolás módja) megváltoztatható anélkül, hogy a hívó oldali kódot módosítani kellene, amíg a publikus interfész változatlan marad.
+    \item \textbf{Olvashatóság:} A kód logikailag összetartozó részei egy helyen vannak.
+\end{itemize}
+
+\subsection{Példa: Bankszámla}
+A példában az egyenleg közvetlen módosítása le van tiltva, így garantálható, hogy negatív összeget nem lehet befizetni.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class Bankszamla {
+private:
+    // ADATREJTÉS: 
+    // A külvilág nem férhet hozzá közvetlenül, így nem tudja elrontani.
+    double egyenleg;
+
+public:
+    // Konstruktor
+    Bankszamla() : egyenleg(0) {}
+
+    // Setter (Beállító) - Validációval
+    void befizet(double osszeg) {
+        if (osszeg > 0) {
+            egyenleg += osszeg;
+        } else {
+            // Hibás adat kezelése (pl. figyelmen kívül hagyás vagy hibaüzenet)
+        }
+    }
+
+    // Getter (Lekérdező) - Csak olvasható hozzáférést ad
+    double getEgyenleg() const {
+        return egyenleg;
+    }
+};
+
+int main() {
+    Bankszamla szamla;
+    
+    // szamla.egyenleg = 10000; // -> FORDÍTÁSI HIBA: 'egyenleg' is private
+    
+    szamla.befizet(5000);       // HELYES: publikus metóduson át
+    szamla.befizet(-200);       // ÉRVÉNYTELEN: a metódus kiszűri
+    
+    return 0;
+}
+\end{minted}

@@ -1,0 +1,81 @@
+\section{Ismertesse példával a „virtuális metódus” elv működését! Mit tartalmaz a VMT (vftable) táblázat? A leszármazottban is ugyanazt a szintaktikát kell használni a virtuális metódus felülírásakor?}
+
+A virtuális metódusok teszik lehetővé a valódi polimorfizmust (késői kötést) C++-ban. Segítségükkel az ősosztályra mutató pointeren keresztül is a ténylegesen létrehozott (leszármazott) objektum megfelelő metódusa hívódik meg.
+
+\subsection{A működési elv: Késői kötés (Late Binding)}
+
+A \texttt{virtual} kulcsszó használatakor a fordító nem fordítási időben (statikusan) dönti el a függvényhívás címét, hanem futásidőre halasztja azt.
+
+\begin{itemize}
+    \item \textbf{Döntés alapja:} A hívás nem a mutató típusától függ (pl. \texttt{Base*}), hanem attól, hogy a memóriában ténylegesen milyen típusú objektum van (pl. \texttt{Derived}).
+    \item \textbf{Eredmény:} Ha van egy \texttt{Base* p = new Derived();} pointerünk, akkor a \texttt{p->virtualFuggveny()} a \texttt{Derived} implementációját fogja futtatni.
+\end{itemize}
+
+\subsection{A VMT (Virtual Method Table) felépítése}
+
+A mechanizmus hátterében egy lookup tábla, a \textbf{VMT} (vagy vtable/vftable) áll.
+
+\begin{itemize}
+    \item \textbf{Mit tartalmaz a táblázat?}
+        \begin{itemize}
+            \item Függvénycímeket (pointereket).
+            \item Minden olyan osztályhoz készül egy statikus tábla, amelynek van legalább egy virtuális függvénye.
+            \item A táblázat sorai az adott osztályhoz érvényes virtuális függvények memóriacímeit tartalmazzák (vagy a sajátját, vagy ha nem írta felül, akkor az örökölt ősét).
+        \end{itemize}
+    \item \textbf{A vptr (Virtual Pointer):}
+        \begin{itemize}
+            \item Minden objektum, amely virtuális metódusokkal rendelkező osztályból származik, tartalmaz egy rejtett mutatót (\texttt{vptr}).
+            \item Ez a mutató az objektum létrehozásakor (a konstruktorban) beállítódik a saját osztálya VMT-jére.
+            \item Híváskor a program: \texttt{objektum} $\rightarrow$ \texttt{vptr} $\rightarrow$ \texttt{VMT} $\rightarrow$ \texttt{helyes függvénycím}.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Szintaktika a leszármazottban}
+
+A felülírás (overriding) szabályai szigorúak, de a szintaxis rugalmas:
+
+\begin{itemize}
+    \item \textbf{Szignatúra egyezése:} A visszatérési értéknek, a névnek és a paraméterlistának \textbf{pontosan} meg kell egyeznie az ősben lévővel.
+    \item \textbf{virtual kulcsszó:} A leszármazottban \textbf{nem kötelező} kiírni a \texttt{virtual} szót (ha az ősben az volt, akkor automatikusan öröklődik a tulajdonság), de az olvashatóság miatt ajánlott.
+    \item \textbf{override kulcsszó (C++11):} Erősen ajánlott a függvény deklarációja után írni az \texttt{override} szót. Ez biztosítja, hogy a fordító hibát dobjon, ha véletlenül elírtuk a függvény nevét vagy paramétereit, és emiatt nem jött létre felülírás.
+\end{itemize}
+
+\subsection{Példa}
+
+
+
+\begin{minted}{cpp}
+#include <iostream>
+
+class Alakzat {
+public:
+    // A VMT bejegyzés létrehozása
+    virtual void rajzol() {
+        std::cout << "Valamilyen alakzat" << std::endl;
+    }
+};
+
+class Kor : public Alakzat {
+public:
+    // Felülírás (Override)
+    // A 'virtual' elhagyható lenne, de az 'override' segít a hibaszűrésben
+    void rajzol() override { 
+        std::cout << "O egy Kor" << std::endl;
+    }
+};
+
+int main() {
+    // Ős típusú mutató, de Leszármazott objektum
+    Alakzat* a = new Kor();
+    
+    // Működés lépései:
+    // 1. 'a' pointer a memóriában lévő objektumra mutat.
+    // 2. Kiolvassa az objektum rejtett 'vptr'-ét.
+    // 3. A vptr a 'Kor' VMT-jére mutat.
+    // 4. A VMT-ből kiveszi a 'Kor::rajzol' címét.
+    a->rajzol(); // Kimenet: "O egy Kor"
+    
+    delete a;
+    return 0;
+}
+\end{minted}

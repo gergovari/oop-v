@@ -1,0 +1,83 @@
+\section{Csoportosítsa az osztályban található elemeket öröklődési szempontból: mely elemek öröklődnek, és mely elemek nem öröklődnek?}
+
+A C++ öröklődési modelljében különbséget teszünk azon elemek között, amelyek automatikusan az utódosztály részévé válnak, és azok között, amelyek szorosan a bázisosztály identitásához (létrehozás, másolás, megszűnés) kötődnek, ezért nem öröklődnek.
+
+\subsection{Örökölt elemek}
+
+Az alábbi elemeket a származtatott osztály megkapja (láthatóságuk a hozzáférési módosítóktól függ, de fizikailag vagy logikailag jelen vannak):
+
+\begin{itemize}
+    \item \textbf{Adattagok (Member variables):}
+        \begin{itemize}
+            \item Minden statikus (\texttt{static}) és nem statikus adattag öröklődik.
+            \item \textit{Megjegyzés:} A \texttt{private} tagok is öröklődnek (lefoglalásra kerülnek a memóriában az utód objektumában), de a kódban közvetlenül nem érhetők el az utódból.
+        \end{itemize}
+    \item \textbf{Tagfüggvények (Member functions):}
+        \begin{itemize}
+            \item Minden statikus és nem statikus metódus.
+            \item Virtuális függvények (ezek felüldefiniálhatók az utódban).
+        \end{itemize}
+    \item \textbf{Belső típusok:}
+        \begin{itemize}
+            \item Az osztályon belül definiált \texttt{typedef}-ek, \texttt{enum}-ok, \texttt{struct}-ok vagy osztályok (amennyiben a hozzáférés ezt engedi).
+        \end{itemize}
+\end{itemize}
+
+\subsection{Nem örökölt elemek}
+
+Ezeket az elemeket a fordító minden osztályhoz egyedileg rendeli (vagy generálja le), nem vehetők át automatikusan a szülőből:
+
+\begin{itemize}
+    \item \textbf{Konstruktorok:}
+        \begin{itemize}
+            \item Az alapértelmezett, paraméteres, másoló és mozgató (move) konstruktorok nem öröklődnek.
+            \item \textit{Kivétel C++11 óta:} Az \texttt{using Base::Base;} utasítással explicit módon „behúzhatók” (inheriting constructors), de alapértelmezésben nem járnak.
+        \end{itemize}
+    \item \textbf{Destruktor:}
+        \begin{itemize}
+            \item Minden osztálynak saját destruktora van. (Bár az utód destruktora automatikusan meghívja az ősét, de nem „örökli” azt).
+        \end{itemize}
+    \item \textbf{Értékadó operátor (\texttt{operator=}):}
+        \begin{itemize}
+            \item A fordító minden osztályhoz saját \texttt{operator=}-t generál, ha nincs megírva. Ez elrejti az ős értékadó operátorát.
+        \end{itemize}
+    \item \textbf{Friend (Barát) relációk:}
+        \begin{itemize}
+            \item „Az apám barátja nem az én barátom.” A barátság nem öröklődik és nem tranzitív.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Összefoglaló táblázat és példa}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Elem típusa} & \textbf{Öröklődik?} \\
+    \hline
+    Adattagok (int x, static int y) & Igen \\
+    Tagfüggvények (void func()) & Igen \\
+    Konstruktorok & Nem \\
+    Destruktor & Nem \\
+    Assignment operator (=) & Nem \\
+    Friend deklarációk & Nem \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\begin{minted}{cpp}
+class Base {
+public:
+    int x;              // ÖRÖKLŐDIK
+    void f() {}         // ÖRÖKLŐDIK
+    
+    Base() {}           // NEM öröklődik (de hívódik)
+    ~Base() {}          // NEM öröklődik (de hívódik)
+    
+    void operator=(const Base&) {} // NEM öröklődik
+    
+    friend void barat(); // NEM öröklődik
+private:
+    int y;              // ÖRÖKLŐDIK (memóriában ott van), de nem látszik
+};
+\end{minted}

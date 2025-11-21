@@ -1,0 +1,86 @@
+\section{Ismertesse a destruktor definícióját, a destruktor készítés szabályait! Mit mondhatunk a destruktor kézi meghívásáról?}
+
+\subsection{Definíció és Szerep}
+A destruktor egy speciális tagfüggvény, amely akkor hívódik meg automatikusan, amikor egy objektum élettartama véget ér (megszűnik).
+
+\begin{itemize}
+    \item \textbf{Célja:} Az objektum által lefoglalt erőforrások felszabadítása (takarítás).
+    \item \textbf{Tipikus feladatok:} Dinamikus memória felszabadítása (\texttt{delete}), nyitott fájlok bezárása, hálózati kapcsolatok bontása, mutexek elengedése.
+    \item \textbf{Jele:} A neve megegyezik az osztály nevével, de egy hullámvonal (\texttt{\~{}}) előzi meg.
+\end{itemize}
+
+\subsection{A készítés szabályai}
+A destruktorra szigorú szintaktikai és szemantikai szabályok vonatkoznak:
+
+\begin{itemize}
+    \item \textbf{Paraméterek:} Nem rendelkezhet paraméterrel. Ebből következik, hogy a destruktor \textbf{nem terhelhető túl} (overloading), osztályonként csak egy lehet belőle.
+    \item \textbf{Visszatérési érték:} Nincs visszatérési típusa, még \texttt{void} sem.
+    \item \textbf{Kivételbiztonság:} Szigorúan tilos kivételt (\texttt{throw}) kiengedni a destruktorból.
+    \begin{itemize}
+        \item \textit{Ok:} Ha a destruktor egy másik kivétel miatti „stack unwinding” (veremlebontás) során fut le, és dob még egy kivételt, a program azonnal összeomlik (\texttt{std::terminate}).
+    \end{itemize}
+    \item \textbf{Virtuális destruktor:}
+    \begin{itemize}
+        \item Ha egy osztályt ősosztálynak szánunk (polimorfizmus), a destruktornak \texttt{virtual}-nak kell lennie.
+        \item \textit{Ok:} Ha az ősosztály pointerén keresztül törlünk egy leszármazott objektumot, és nem virtuális a destruktor, csak az ős része semmisül meg (Undefined Behavior / Memory Leak).
+    \end{itemize}
+\end{itemize}
+
+\subsection{A destruktor kézi meghívásáról}
+Normál körülmények között a destruktort \textbf{soha nem hívjuk meg} explicit módon.
+
+\begin{itemize}
+    \item \textbf{Általános szabály:} A fordító automatikusan beszúrja a hívást a blokk végére (stack objektumok) vagy a \texttt{delete} operátor hívásakor (heap objektumok).
+    \item \textbf{Veszélye:} Ha kézzel meghívjuk, majd az objektum megszűnésekor automatikusan újra lefut, az \textit{Double Free} hibához és programösszeomláshoz vezet.
+    \item \textbf{Az egyetlen kivétel (Placement New):}
+    \begin{itemize}
+        \item Ha az objektumot a \textit{Placement New} segítségével egy előre lefoglalt memóriaterületre hoztuk létre (anélkül, hogy a memóriát az operációs rendszertől kértük volna), akkor nem hívhatunk rá \texttt{delete}-et (mert nem szabad felszabadítani a puffert).
+        \item Ilyenkor \textbf{kötelező} kézzel meghívni a destruktort a takarításhoz.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a helyes destruktor definíciót és a ritka kivételt, a kézi meghívást.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+#include <new> // placement new-hez
+
+class Resource {
+    int* data;
+public:
+    Resource() { 
+        data = new int[100]; 
+        std::cout << "Konstruktor: memoria foglalva" << std::endl;
+    }
+
+    // Virtuális destruktor (ha esetleg örökölnénk belőle)
+    virtual ~Resource() { 
+        delete[] data; 
+        std::cout << "Destruktor: memoria felszabaditva" << std::endl;
+    }
+};
+
+int main() {
+    // --- 1. Normál eset (Automatikus hívás) ---
+    {
+        Resource r; 
+    } // Itt automatikusan lefut a ~Resource()
+
+    // --- 2. Speciális eset (Placement New és Kézi hívás) ---
+    
+    // Nyers memória puffer (stack-en)
+    alignas(Resource) char buffer[sizeof(Resource)];
+
+    // Objektum létrehozása a pufferben (nem allokál új memóriát)
+    Resource* ptr = new(buffer) Resource();
+
+    // TILOS: delete ptr; 
+    // Mivel a 'buffer' a stack-en van, nem szabad free-t hívni rá!
+
+    // HELYES: Kézi destruktor hívás
+    ptr->~Resource(); 
+
+    return 0;
+}
+\end{minted}

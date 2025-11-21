@@ -1,0 +1,96 @@
+\section{Ismertesse példával a fuzzy következtető módszer működését!}
+
+A fuzzy következtetés (Inference) folyamatát a legszemléletesebben a **Mamdani-típusú** módszerrel lehet bemutatni. A példában egy egyszerű **Ventilátor Szabályozót** valósítunk meg, ahol a bemenet a hőmérséklet, a kimenet a ventilátor fordulatszáma.
+
+\subsection{A példa paraméterei}
+
+\begin{itemize}
+    \item \textbf{Bemenet ($x$):} Hőmérséklet ($0 \dots 40^\circ\text{C}$).
+    \item \textbf{Kimenet ($y$):} Fordulatszám ($0 \dots 1000 \text{ RPM}$).
+    \item \textbf{Szabálybázis (2 szabály):}
+        \begin{enumerate}
+            \item \textbf{R1:} HA Hőmérséklet = \textit{Hideg}, AKKOR Fordulat = \textit{Lassú}.
+            \item \textbf{R2:} HA Hőmérséklet = \textit{Meleg}, AKKOR Fordulat = \textit{Gyors}.
+        \end{enumerate}
+    \item \textbf{Aktuális mérés (Crisp input):} $x_0 = 28^\circ\text{C}$.
+\end{itemize}
+
+\subsection{1. Lépés: Fuzzifikálás (Fuzzification)}
+
+A konkrét mért értéket ($28^\circ\text{C}$) levetítjük a bemeneti tagsági függvényekre, hogy megkapjuk a tagsági fokokat ($\mu$).
+
+\begin{itemize}
+    \item A $28^\circ\text{C}$ már inkább meleg, de kicsit még hidegnek is számíthat (az átfedés miatt).
+    \item Leolvasott értékek:
+        \begin{itemize}
+            \item $\mu_{Hideg}(28) = 0.2$ (20\%-ban tartozik a Hideg halmazba).
+            \item $\mu_{Meleg}(28) = 0.8$ (80\%-ban tartozik a Meleg halmazba).
+        \end{itemize}
+\end{itemize}
+
+\subsection{2. Lépés: Kiértékelés (Inference / Implication)}
+
+Meghatározzuk a szabályok "tüzelési erősségét" (activation strength), és ezt alkalmazzuk a kimeneti halmazokra.
+
+\begin{itemize}
+    \item \textbf{R1 szabály (Hideg $\rightarrow$ Lassú):}
+        \begin{itemize}
+            \item A szabály feltétele $0.2$-es erősséggel teljesült.
+            \item A kimeneti \textit{Lassú} fuzzy halmazt **levágjuk (csonkoljuk)** a $0.2$-es magasságnál (Minimum operátor).
+            \item Eredmény: Egy $0.2$ magas trapéz (a \textit{Lassú} halmaz alja).
+        \end{itemize}
+    \item \textbf{R2 szabály (Meleg $\rightarrow$ Gyors):}
+        \begin{itemize}
+            \item A szabály feltétele $0.8$-as erősséggel teljesült.
+            \item A kimeneti \textit{Gyors} fuzzy halmazt **levágjuk** a $0.8$-as magasságnál.
+            \item Eredmény: Egy $0.8$ magas trapéz (a \textit{Gyors} halmaz nagy része).
+        \end{itemize}
+\end{itemize}
+
+\subsection{3. Lépés: Aggregáció (Aggregation)}
+
+A szabályok részeredményeit egyesítjük egyetlen eredő fuzzy halmazzá.
+
+\begin{itemize}
+    \item A két csonkolt alakzatot (a kicsi \textit{Lassú}-t és a nagy \textit{Gyors}-at) "egymásra rakjuk" az **Unió (Maximum)** művelettel.
+    \item Az eredmény egy komplex, szabálytalan alakzat, amely a kimeneti univerzum felett helyezkedik el.
+\end{itemize}
+
+\subsection{4. Lépés: Defuzzifikálás (Defuzzification)}
+
+Az aggregált alakzatból egyetlen konkrét számot kell nyernünk a ventilátor vezérléséhez.
+
+\begin{itemize}
+    \item \textbf{Módszer:} Súlypontszámítás (Center of Gravity - COG).
+    \item Megkeressük az eredő síkidom súlypontjának $x$ koordinátáját.
+    \item Mivel a \textit{Gyors} halmaz dominál ($0.8$ vs $0.2$), a súlypont a magasabb tartomány felé tolódik.
+    \item \textbf{Eredmény:} $y_{out} \approx 750 \text{ RPM}$.
+\end{itemize}
+
+\subsection{Programkód (Szimuláció)}
+
+\begin{minted}{python}
+# Pszeudokód a Mamdani következtetésre
+
+# 1. Bemeneti mérés
+x_temp = 28
+
+# 2. Fuzzifikálás (Tagsági függvények lekérdezése)
+# Feltételezve, hogy definiált függvények
+mu_hideg = membership_hideg(x_temp) # 0.2
+mu_meleg = membership_meleg(x_temp) # 0.8
+
+# 3. Kiértékelés (Implikáció - MIN operátor)
+# A kimeneti halmazok "levágása"
+rule1_shape = min(mu_hideg, output_set_lassu) # Lassú halmaz max 0.2 magasan
+rule2_shape = min(mu_meleg, output_set_gyors) # Gyors halmaz max 0.8 magasan
+
+# 4. Aggregáció (Unió - MAX operátor)
+final_fuzzy_shape = max(rule1_shape, rule2_shape)
+
+# 5. Defuzzifikálás (Súlypont)
+# Integrálás az y tengely mentén
+output_rpm = center_of_gravity(final_fuzzy_shape)
+
+print(f"Ventilator fordulat: {output_rpm} RPM")
+\end{minted}

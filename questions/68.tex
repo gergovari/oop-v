@@ -1,0 +1,49 @@
+\section{Ismertesse az általános hatványközép operátort, és a paraméter speciális eseteiben elnevezett értékeit!}
+
+Az általános hatványközép (más néven Hölder-közép) egy olyan paraméterezhető aggregációs operátor család, amely a $p$ paraméter változtatásával képes lefedni a teljes skálát a minimumtól a maximumig, magában foglalva a klasszikus középértékeket is.
+
+\subsection{Definíció}
+
+Legyen $x_1, x_2, \dots, x_n$ a bemeneti értékek halmaza, ahol $x_i \in [0, 1]$ (vagy pozitív valós számok). Az általános hatványközép operátort a $p \in \pmb{R}$ ($p \neq 0$) paraméterrel a következőképpen definiáljuk:
+
+$$ M_p(x_1, \dots, x_n) = \left( \frac{1}{n} \sum_{i=1}^{n} x_i^p \right)^{\frac{1}{p}} $$
+
+\subsection{Speciális esetek (Nevezetes közepek)}
+
+A $p$ paraméter különböző értékeire (illetve határértékeire) visszakapjuk az ismert középértékeket:
+
+\begin{itemize}
+    \item \textbf{$p = 1$: Számtani közép (Arithmetic Mean)}
+        $$ M_1(\mathbf{x}) = \frac{1}{n} \sum_{i=1}^{n} x_i $$
+        Ez a leggyakrabban használt átlagoló operátor.
+
+    \item \textbf{$p = 2$: Négyzetes közép (Quadratic Mean / RMS)}
+        $$ M_2(\mathbf{x}) = \sqrt{\frac{1}{n} \sum_{i=1}^{n} x_i^2} $$
+        Főleg jelfeldolgozásban és fizikában használatos.
+
+    \item \textbf{$p \to 0$: Mértani közép (Geometric Mean)}
+        Bár a képletbe közvetlenül nem helyettesíthető be a 0, L'Hôpital-szabállyal belátható:
+        $$ \lim_{p \to 0} M_p(\mathbf{x}) = \sqrt[n]{\prod_{i=1}^{n} x_i} $$
+        Akkor használatos, ha az arányok fontosabbak a különbségeknél.
+
+    \item \textbf{$p = -1$: Harmonikus közép (Harmonic Mean)}
+        $$ M_{-1}(\mathbf{x}) = \frac{n}{\sum_{i=1}^{n} \frac{1}{x_i}} $$
+        Párhuzamos ellenállások vagy átlagsebesség számításánál fordul elő.
+
+    \item \textbf{$p \to \infty$: Maximum operátor (Max)}
+        $$ \lim_{p \to \infty} M_p(\mathbf{x}) = \max(x_1, \dots, x_n) $$
+        Ez a legnagyobb "VAGY" jellegű (s-norma) aggregáció ebben a családban.
+
+    \item \textbf{$p \to -\infty$: Minimum operátor (Min)}
+        $$ \lim_{p \to -\infty} M_p(\mathbf{x}) = \min(x_1, \dots, x_n) $$
+        Ez a legszigorúbb "ÉS" jellegű (t-norma) aggregáció.
+\end{itemize}
+
+\subsection{Tulajdonságok}
+
+\begin{itemize}
+    \item \textbf{Monotonitás a $p$ szerint:} Az operátor értéke a $p$ növelésével monoton nő.
+        $$ \min(\mathbf{x}) \le M_{-1}(\mathbf{x}) \le M_0(\mathbf{x}) \le M_1(\mathbf{x}) \le \max(\mathbf{x}) $$
+    \item \textbf{Idempotencia:} Minden $p$ esetén teljesül, hogy $M_p(c, \dots, c) = c$.
+    \item \textbf{Kompenzáció:} Átlagoló operátor lévén az eredmény mindig a legkisebb és legnagyobb bemeneti érték közé esik.
+\end{itemize}

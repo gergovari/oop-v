@@ -1,0 +1,99 @@
+\section{Ismertesse a konstruktor megadásának szabályait! Milyen esetekben kell felülírnuk a fordító által definiált konstruktorokat?}
+
+\subsection{A konstruktor megadásának szabályai}
+A konstruktorok definiálásakor a szintaktikai szabályokon túl szemantikai elveket is követnünk kell a helyes működés érdekében.
+
+\begin{itemize}
+    \item \textbf{Név és Típus:}
+    \begin{itemize}
+        \item A neve megegyezik az osztály nevével.
+        \item \textbf{Nincs visszatérési típusa}, még \texttt{void} sem.
+    \end{itemize}
+    
+    \item \textbf{Paraméterek és Túlterhelés:}
+    \begin{itemize}
+        \item Bármennyi paramétere lehet, és túlterhelhető (overloading).
+        \item Használható alapértelmezett paraméterérték (default argument). Ha minden paraméternek van default értéke, az \textit{default konstruktornak} számít.
+    \end{itemize}
+
+    \item \textbf{Taginicializáló lista (Initializer List):}
+    \begin{itemize}
+        \item A konstruktor törzse előtt, kettősponttal (\texttt{:}) bevezetve.
+        \item \textbf{Kötelező:} konstans adattagok, referencia típusú tagok, és paraméter nélküli konstruktorral nem rendelkező objektum-adattagok esetén.
+        \item \textbf{Sorrend:} A tagok inicializálása a \textit{deklaráció sorrendjében} történik, nem a listában írt sorrendben!
+    \end{itemize}
+
+    \item \textbf{Explicit kulcsszó:}
+    \begin{itemize}
+        \item Egyparaméteres konstruktorok elé ajánlott kiírni az \texttt{explicit} kulcsszót.
+        \item Ez megakadályozza, hogy a fordító implicit típuskonverziót hajtson végre (pl. \texttt{int} -> \texttt{Osztaly} átalakítás egy értékadásnál).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Mikor kell felülírni a fordító által generált konstruktorokat?}
+Az alapértelmezett működés (sekély másolás / shallow copy) gyakran nem megfelelő. A döntést általában a \textbf{„A Három Szabálya” (Rule of Three)} – modern C++-ban az Öt Szabálya – alapján hozzuk meg.
+
+\begin{enumerate}
+    \item \textbf{Erőforrás-kezelés (Nyers pointerek):}
+    Ha az osztály dinamikusan foglal memóriát (\texttt{new}) a konstruktorban, és felszabadítja a destruktorban, akkor kötelező megírni a \textbf{másoló konstruktort}.
+    \begin{itemize}
+        \item \textit{Ok:} A generált másoló konstruktor csak a pointer címét másolná. Destruktor híváskor mindkét objektum ugyanazt a memóriát próbálná felszabadítani (\textit{double free}), illetve az egyik módosítása hatna a másikra.
+        \item \textit{Megoldás:} Mély másolás (Deep Copy) implementálása.
+    \end{itemize}
+
+    \item \textbf{Nem memória jellegű erőforrások (Fájlkezelők, Socketek):}
+    Ha az osztály exkluzív hozzáférést birtokol (pl. megnyitott fájl), a másolás logikailag hibás lehet. Ilyenkor a másoló konstruktort gyakran \textbf{töröljük} (\texttt{= delete}), hogy megakadályozzuk a duplikálást.
+
+    \item \textbf{Validáció:}
+    Ha az objektum csak bizonyos feltételek mellett jöhet létre (pl. egy kör sugara nem lehet negatív), a saját konstruktorban ellenőrzést (exception dobást) kell végrehajtani.
+
+    \item \textbf{Explicit inicializálás:}
+    Ha azt szeretnénk, hogy az osztály adattagjai (pl. primitív típusok, pointerek) biztosan nullázva legyenek, és ne szemetet tartalmazzanak, mivel a default konstruktor a primitív típusokat nem inicializálja automatikusan.
+\end{enumerate}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja az \texttt{explicit} használatát és a mély másolás szükségességét (Rule of Three).
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+class IntBuffer {
+    int* data;
+    size_t size;
+
+public:
+    // 1. EXPLICIT: Megelőzi a véletlen konverziót (pl. IntBuffer b = 5;)
+    explicit IntBuffer(size_t s) : size(s) {
+        // Erőforrás foglalás -> Kell saját destruktor és copy ctor!
+        data = new int[size]; 
+        for(size_t i=0; i<size; ++i) data[i] = 0;
+    }
+
+    ~IntBuffer() {
+        delete[] data;
+    }
+
+    // 2. MÁSOLÓ KONSTRUKTOR FELÜLÍRÁSA (Deep Copy)
+    // Ha ezt nem írnánk meg, a default ctor csak a pointert másolná.
+    // Eredmény: két objektum mutatna ugyanoda -> crash a delete-nél.
+    IntBuffer(const IntBuffer& other) : size(other.size) {
+        data = new int[size]; // Új memória foglalása
+        for(size_t i=0; i<size; ++i) {
+            data[i] = other.data[i]; // Adatok átmásolása
+        }
+    }
+
+    // A teljesség kedvéért az értékadó operátort is illene felülírni
+    // IntBuffer& operator=(const IntBuffer& other) { ... }
+};
+
+void processBuffer(const IntBuffer& buf) { /* ... */ }
+
+int main() {
+    IntBuffer b1(10); 
+    
+    // processBuffer(10); // HIBA: Az 'explicit' miatt nem konvertál int-et
+    processBuffer(IntBuffer(10)); // OK: Explicit hívás
+    
+    IntBuffer b2 = b1; // Saját másoló konstruktor hívódik (biztonságos)
+    return 0;
+}
+\end{minted}

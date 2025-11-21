@@ -1,0 +1,66 @@
+\section{Ismertesse egy előre megírt programrendszer (netről letöltött, vagy eszközzel kapott SDK) használatának lépéseit C++-ban!}
+
+Egy külső könyvtár (Library) vagy szoftverfejlesztői készlet (SDK) integrálása C++-ban több lépésből áll, mivel a nyelv szétválasztja a deklarációt (fejlécfájlok) és a megvalósítást (lefordított binárisok). A folyamat három fő fázisra bontható: fordítási beállítások, szerkesztési (linkelési) beállítások és futtatási környezet.
+
+\subsection{1. Az állományok előkészítése}
+
+A letöltött SDK általában három fő mappát tartalmaz, amelyeket érdemes a projekt közelében elhelyezni:
+\begin{itemize}
+    \item \textbf{include:} A \texttt{.h} vagy \texttt{.hpp} kiterjesztésű fejlécfájlok (interfész leírása).
+    \item \textbf{lib:} A lefordított könyvtárfájlok (\texttt{.lib} Windows-on, \texttt{.a} Linux-on).
+    \item \textbf{bin:} A futtatható binárisok vagy dinamikus könyvtárak (\texttt{.dll} Windows-on, \texttt{.so} Linux-on).
+\end{itemize}
+
+\subsection{2. Fordítási beállítások (Compiler Settings)}
+
+A fordítónak tudnia kell, hol találja a függvények és osztályok deklarációit, hogy értelmezni tudja a kódban lévő hívásokat.
+
+\begin{itemize}
+    \item \textbf{Include Directories (Keresési útvonal):}
+        Meg kell adni a fordítónak (IDE beállításokban vagy \texttt{-I} flaggel) az SDK \textbf{include} mappájának elérési útját.
+    \item \textbf{Forráskód:}
+        A saját kódban be kell emelni a szükséges fejlécfájlt:
+        \begin{minted}{cpp}
+#include <sdk_header.h> // Vagy "sdk_header.h"
+        \end{minted}
+\end{itemize}
+
+\subsection{3. Szerkesztési beállítások (Linker Settings)}
+
+A szerkesztőnek (linker) össze kell kötnie a lefordított kódunkat az SDK lefordított kódjával. Ha ez a lépés kimarad, "Unresolved external symbol" hibát kapunk.
+
+\begin{itemize}
+    \item \textbf{Library Directories (Könyvtár útvonal):}
+        Meg kell adni a linkernek (IDE beállításokban vagy \texttt{-L} flaggel) az SDK \textbf{lib} mappájának elérési útját.
+    \item \textbf{Input Dependencies (Függőségek):}
+        Konkrétan meg kell nevezni, melyik \texttt{.lib} fájlt kell hozzászerkeszteni a programhoz (pl. \texttt{mylib.lib} vagy \texttt{-lmylib}).
+\end{itemize}
+
+\subsection{4. Futásidejű feltételek (Runtime)}
+
+Ez a lépés attól függ, hogy statikus vagy dinamikus linkelést használunk-e.
+
+\begin{itemize}
+    \item \textbf{Statikus linkelés (.lib / .a):} A kód belemásolódik a mi \texttt{.exe} fájlunkba. Nincs további teendő, de a program mérete nagyobb lesz.
+    \item \textbf{Dinamikus linkelés (.dll / .so):} Csak hivatkozások kerülnek a programba.
+        \begin{itemize}
+            \item A program indításakor az operációs rendszernek meg kell találnia a dinamikus könyvtárat.
+            \item \textbf{Megoldás:} A szükséges \texttt{.dll} fájlokat (a \textbf{bin} mappából) be kell másolni a kész programunk (\texttt{.exe}) mellé, vagy hozzáadni az elérési utat a rendszer \texttt{PATH} környezeti változójához.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Összefoglaló példa (CMake stílusban)}
+
+\begin{minted}{cmake}
+# 1. Include mappa megadása (Fordító)
+include_directories(path/to/sdk/include)
+
+# 2. Lib mappa megadása (Linker)
+link_directories(path/to/sdk/lib)
+
+# 3. Futtatható fájl létrehozása
+add_executable(MyGame main.cpp)
+
+# 4. Konkrét lib fájl hozzárendelése (Linker)
+target_link_libraries(MyGame sdk_library_name)
+\end{minted}

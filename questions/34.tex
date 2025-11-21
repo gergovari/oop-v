@@ -1,0 +1,85 @@
+\section{Ismertesse a string-numerikus adat közti konverzióra használt osztályt!}
+
+A C++ nyelvben a karakterláncok (stringek) és numerikus típusok (int, double stb.) közötti kétirányú, formázott konverzióra leggyakrabban az \texttt{std::stringstream} osztályt használjuk. Ez az osztály a \texttt{<sstream>} header fájlban található.
+
+\subsection{Az osztály jellemzői és felépítése}
+
+A \texttt{stringstream} egyesíti a bemeneti és kimeneti adatfolyamok tulajdonságait, de nem konzolra vagy fájlba ír, hanem a memóriában dolgozik.
+
+\begin{itemize}
+    \item \textbf{Öröklődés:} Az \texttt{iostream} leszármazottja, így ugyanazokkal az operátorokkal (\texttt{<<}, \texttt{>>}) kezelhető, mint a \texttt{cin} vagy a \texttt{cout}.
+    \item \textbf{Belső puffer:} Egy belső \texttt{std::string} objektumot kezel pufferként; ebbe írunk bele vagy ebből olvasunk ki.
+    \item \textbf{Típusbiztonság:} A C-stílusú \texttt{sprintf}-fel ellentétben típusbiztos és nem okoz puffertúlcsordulást.
+\end{itemize}
+
+\subsection{Fő metódusok és kezelés}
+
+\begin{itemize}
+    \item \textbf{\texttt{str()}:}
+        \begin{itemize}
+            \item Paraméter nélkül: Visszaadja a belső puffer tartalmát \texttt{std::string}-ként (pl. konverzió végeredménye).
+            \item Paraméterrel (string): Beállítja a belső puffer tartalmát (pl. konverzió kezdete).
+        \end{itemize}
+    \item \textbf{\texttt{clear()}:}
+        \begin{itemize}
+            \item Törli az állapotjelző biteket (pl. EOF, failbit).
+            \item \textbf{Fontos:} Nem törli a tartalmat! Ha újra akarjuk használni a streamet, a tartalmat az \texttt{str("")} hívással, a hibaállapotot a \texttt{clear()} hívással kell alaphelyzetbe állítani.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Konverziós irányok}
+
+\begin{itemize}
+    \item \textbf{Szám $\rightarrow$ String (Szerializáció):}
+        \begin{enumerate}
+            \item Adat beírása a streambe a \texttt{<<} operátorral.
+            \item Eredmény kinyerése az \texttt{.str()} metódussal.
+        \end{enumerate}
+    \item \textbf{String $\rightarrow$ Szám (Parsolás):}
+        \begin{enumerate}
+            \item A string betöltése a streambe (konstruktorban vagy \texttt{.str()} hívással).
+            \item Adat kiolvasása célváltozóba a \texttt{>>} operátorral.
+            \item A stream automatikusan kezeli a whitespace karaktereket elválasztóként.
+        \end{enumerate}
+\end{itemize}
+
+\subsection{Mintapélda}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <sstream> // Kötelező header
+#include <string>
+
+int main() {
+    // 1. Konverzió: Szám -> String
+    int szam = 42;
+    double lebegopontos = 3.14;
+    
+    std::stringstream ss_out;
+    
+    // Beírás a streambe (mint a cout-nál)
+    ss_out << szam << " " << lebegopontos;
+    
+    // Kinyerés stringként
+    std::string eredmeny = ss_out.str();
+    std::cout << "Stringge alakitva: " << eredmeny << std::endl;
+
+    // -----------------------------------------
+
+    // 2. Konverzió: String -> Szám
+    std::string bemenet = "1985 75.5";
+    std::stringstream ss_in(bemenet); // Inicializálás stringgel
+    
+    int ev;
+    float suly;
+    
+    // Kiolvasás változókba (mint a cin-nél)
+    ss_in >> ev >> suly;
+    
+    if (!ss_in.fail()) {
+        std::cout << "Ev: " << ev << ", Suly: " << suly << std::endl;
+    }
+
+    return 0;
+}
+\end{minted}

@@ -1,0 +1,65 @@
+\section{Ismertesse a névterek definiálásának szükségességét a C++ programokban! Melyik operátorral hivatkozhatunk egy adott névtérben található osztályra?}
+
+\subsection{A névterek (Namespaces) szükségessége}
+A C++ programozásban a névterek elsődleges célja a globális névtérben fellépő zsúfoltság és a **névütközések (name collisions)** megakadályozása.
+
+\begin{itemize}
+    \item \textbf{Névütközések elkerülése:}
+    Nagyobb szoftverrendszerek vagy több külső könyvtár (library) használata esetén gyakori, hogy azonos neveket használnak (pl. \texttt{Node}, \texttt{String}, \texttt{Vector}). Névterek nélkül a fordító nem tudná megkülönböztetni ezeket, ami fordítási hibát okozna.
+    
+    \item \textbf{Logikai szervezés:}
+    A névterek lehetővé teszik a kód moduláris felépítését. A kapcsolódó osztályokat és függvényeket (pl. fájlkezelés, hálózat, grafika) logikailag elkülönített csoportokba rendezhetjük (pl. \texttt{std}, \texttt{boost}, \texttt{sfml}).
+    
+    \item \textbf{Globális névtér védelme:}
+    Megakadályozza a globális változók és függvények véletlen felülírását vagy árnyékolását.
+\end{itemize}
+
+\subsection{Hivatkozás az elemekre}
+Egy adott névtérben található osztályra vagy tagra a **hatókör-feloldó operátorral (Scope Resolution Operator)** hivatkozhatunk.
+
+\begin{itemize}
+    \item \textbf{Jele:} \texttt{::} (kettős kettőspont).
+    \item \textbf{Formátum:} \texttt{NévtérNeve::Azonosító}.
+    \item \textbf{Alternatíva (using):} A \texttt{using namespace ...;} utasítással a névtér elemei beemelhetők az aktuális hatókörbe, így az operátor elhagyható, de ez a névütközések veszélye miatt óvatosan használandó.
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa két azonos nevű osztály (\texttt{Connection}) békés együttélését mutatja be névterek segítségével.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+// 1. Hálózati modul névtere
+namespace Network {
+    class Connection {
+    public:
+        void connect() { std::cout << "Connecting via TCP..." << std::endl; }
+    };
+}
+
+// 2. Adatbázis modul névtere
+namespace Database {
+    class Connection {
+    public:
+        void connect() { std::cout << "Connecting to SQL..." << std::endl; }
+    };
+}
+
+int main() {
+    // Névtér minősítés nélkül fordítási hiba lenne:
+    // Connection c; // HIBA: "ambiguous"
+    
+    // Használat a :: operátorral
+    Network::Connection netConn;
+    Database::Connection dbConn;
+    
+    netConn.connect();
+    dbConn.connect();
+    
+    // Using deklaráció egy adott elemre
+    using Network::Connection;
+    Connection c; // Most a Network::Connection-t jelenti
+    
+    return 0;
+}
+\end{minted}

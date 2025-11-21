@@ -1,0 +1,69 @@
+\section{Ismertesse ábrával a „közvetlen bázisosztály” és a „közvetett bázisosztály” fogalmakat!}
+
+Az objektumorientált programozásban az öröklődési hierarchia mélysége alapján különböztetjük meg az ősöket. Ez a megkülönböztetés fontos a névütközések feloldása, a konverziók és a konstruktorhívások szempontjából.
+
+\subsection{Fogalmak definíciója}
+
+\begin{itemize}
+    \item \textbf{Közvetlen bázisosztály (Direct Base Class):}
+        Az az osztály, amelyből az adott osztályt specifikusan származtattuk. Ez az osztály szerepel a leszármazott osztály definíciójában a kettőspont után.
+    \item \textbf{Közvetett bázisosztály (Indirect Base Class):}
+        Az öröklődési láncban feljebb (távolabb) elhelyezkedő ősök (pl. a „nagyszülő”). Ezek tulajdonságait a leszármazott a köztes osztályokon keresztül, tranzitív módon örökli.
+\end{itemize}
+
+\subsection{Strukturális Ábra}
+
+Az alábbi diagram a \textbf{„C” osztály szemszögéből} mutatja be a relációkat egy többszintű öröklődés (Multilevel Inheritance) esetén.
+
+
+
+\begin{verbatim}
+      +-------------------+
+      |     Osztály A     | <------- "C" KÖZVETETT bázisosztálya
+      +-------------------+          (A "B"-nek közvetlen őse)
+                ^
+                |
+      +---------+---------+
+      |     Osztály B     | <------- "C" KÖZVETLEN bázisosztálya
+      +-------------------+          (A definícióban szerepel)
+                ^
+                |
+      +---------+---------+
+      |     Osztály C     | <------- Vizsgált osztály (Leszármazott)
+      +-------------------+
+\end{verbatim}
+
+\subsection{Programrészlet és Szintaktika}
+
+\begin{minted}{cpp}
+// 1. A legfelső szint
+class A {
+public:
+    int x;
+};
+
+// 2. Köztes szint
+// Itt: 'A' a 'B' osztály KÖZVETLEN bázisosztálya
+class B : public A {
+public:
+    int y;
+};
+
+// 3. Alsó szint
+// Itt: 'B' a 'C' osztály KÖZVETLEN bázisosztálya
+// Itt: 'A' a 'C' osztály KÖZVETETT bázisosztálya
+class C : public B {
+public:
+    void teszt() {
+        x = 10; // Eléri a közvetett ős tagját is (ha public/protected)
+        y = 20; // Eléri a közvetlen ős tagját is
+    }
+};
+\end{minted}
+
+\subsection{Fontos szabályok}
+
+\begin{itemize}
+    \item \textbf{Konstruktor hívás:} A leszármazott osztály konstruktorának inicializáló listájában (\texttt{C() : ...}) \textbf{kizárólag a közvetlen bázisosztály} (\texttt{B}) konstruktora hívható meg. A közvetett ős (\texttt{A}) inicializálása a köztes osztály (\texttt{B}) felelőssége.
+    \item \textbf{Virtuális öröklés kivétele:} Virtuális öröklés esetén (\texttt{virtual inheritance}) a „legalsó” leszármazott felelős a virtuális közvetett ős inicializálásáért.
+\end{itemize}

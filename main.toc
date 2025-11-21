@@ -8,4 +8,331 @@
 \contentsline {section}{\numberline {3}Ismertesse a referencia típusú változók deklarációját, használatát, és a referencia adattagot tartalmazó osztályok konstruktorának megvalósítását! Írjon példát a referencia típus használatára függvényben!}{4}{}%
 \contentsline {subsection}{\numberline {3.1}Referencia változók (Alias)}{4}{}%
 \contentsline {subsection}{\numberline {3.2}Referencia adattagok és a konstruktor}{4}{}%
-\contentsline {subsection}{\numberline {3.3}Referencia használata függvényekben}{4}{}%
+\contentsline {subsection}{\numberline {3.3}Referencia használata függvényekben}{5}{}%
+\contentsline {section}{\numberline {4}Ismertesse a C++ nyelvben a függvények alapértelmezett paraméterezésének lehetőségét, és ennek szabályait!}{6}{}%
+\contentsline {subsection}{\numberline {4.1}Fogalma és Célja}{6}{}%
+\contentsline {subsection}{\numberline {4.2}Szintaxis}{6}{}%
+\contentsline {subsection}{\numberline {4.3}Alapvető Szabályok}{6}{}%
+\contentsline {subsection}{\numberline {4.4}Kódpélda a szabályokra}{7}{}%
+\contentsline {section}{\numberline {5}Ismertesse a C++ nyelvben a függvények túlterhelésének lehetőségét és ennek szabályait!}{8}{}%
+\contentsline {subsection}{\numberline {5.1}Fogalma és Lényege}{8}{}%
+\contentsline {subsection}{\numberline {5.2}A megkülönböztetés szabályai}{8}{}%
+\contentsline {subsection}{\numberline {5.3}Szigorú korlátok és hibalehetőségek}{8}{}%
+\contentsline {subsubsection}{\numberline {5.3.1}1. Visszatérési érték (Return Type)}{8}{}%
+\contentsline {subsubsection}{\numberline {5.3.2}2. Kétértelműség (Ambiguity)}{9}{}%
+\contentsline {subsection}{\numberline {5.4}Összefoglaló táblázat}{9}{}%
+\contentsline {section}{\numberline {6}Ismertesse a C++ nyelvben a template-ek működését függvény és osztály definiálása során! Írjon példán template-tel deklarált függvényre és használatára!}{10}{}%
+\contentsline {subsection}{\numberline {6.1}Fogalma és Célja}{10}{}%
+\contentsline {subsection}{\numberline {6.2}Működési Mechanizmus}{10}{}%
+\contentsline {subsection}{\numberline {6.3}Függvény és Osztály definiálása}{10}{}%
+\contentsline {subsubsection}{\numberline {6.3.1}1. Függvény Template}{10}{}%
+\contentsline {subsubsection}{\numberline {6.3.2}2. Osztály Template}{10}{}%
+\contentsline {subsection}{\numberline {6.4}Példa: Függvény template használata}{10}{}%
+\contentsline {section}{\numberline {7}Ismertesse a C++ nyelv memóriafoglalás és felszabadítás operátorait dinamikus példányok létrehozására és megszüntetésére! Írjon példát egy n elemű, double típusú adatokat tartalmazó tömb létrehozására és megszüntetésére!}{12}{}%
+\contentsline {subsection}{\numberline {7.1}Az operátorok áttekintése}{12}{}%
+\contentsline {subsection}{\numberline {7.2}Skalár vs. Tömbös változatok}{12}{}%
+\contentsline {subsection}{\numberline {7.3}Példa: n elemű double tömb kezelése}{12}{}%
+\contentsline {section}{\numberline {8}Ismertesse a C++ hibakezelésben használható try-catch blokk működését!}{14}{}%
+\contentsline {subsection}{\numberline {8.1}Alapfogalmak és Cél}{14}{}%
+\contentsline {subsection}{\numberline {8.2}A három fő komponens}{14}{}%
+\contentsline {subsection}{\numberline {8.3}Működési folyamat}{14}{}%
+\contentsline {subsection}{\numberline {8.4}Példa: Nullával való osztás kezelése}{14}{}%
+\contentsline {subsection}{\numberline {8.5}Fontos szabályok}{15}{}%
+\contentsline {section}{\numberline {9}Ismertesse az „egységbe zárás” objektum-orientált elvet!}{16}{}%
+\contentsline {subsection}{\numberline {9.1}Fogalma és Lényege}{16}{}%
+\contentsline {subsection}{\numberline {9.2}Megvalósítás C++ nyelven}{16}{}%
+\contentsline {subsection}{\numberline {9.3}Az egységbe zárás előnyei}{16}{}%
+\contentsline {subsection}{\numberline {9.4}Példa: Bankszámla}{16}{}%
+\contentsline {section}{\numberline {10}Ismertesse az „adatrejtés” objektum-orientált elvet!}{18}{}%
+\contentsline {subsection}{\numberline {10.1}Fogalma és Lényege}{18}{}%
+\contentsline {subsection}{\numberline {10.2}Megvalósítás C++ nyelven}{18}{}%
+\contentsline {subsection}{\numberline {10.3}Miért fontos? (Előnyök)}{18}{}%
+\contentsline {subsection}{\numberline {10.4}Példa: Ellenőrzött hozzáférés}{18}{}%
+\contentsline {section}{\numberline {11}Ismertesse az „öröklődés” objektum-orientált elvet!}{20}{}%
+\contentsline {subsection}{\numberline {11.1}Fogalma és Lényege}{20}{}%
+\contentsline {subsection}{\numberline {11.2}Terminológia}{20}{}%
+\contentsline {subsection}{\numberline {11.3}A \texttt {protected} (Védett) hozzáférés szerepe}{20}{}%
+\contentsline {subsection}{\numberline {11.4}Szintaxis és Példa}{20}{}%
+\contentsline {subsection}{\numberline {11.5}Összegzés}{21}{}%
+\contentsline {section}{\numberline {12}Ismertesse a „sokalakúság” objektum-orientált elvet!}{22}{}%
+\contentsline {subsection}{\numberline {12.1}Fogalma és Lényege}{22}{}%
+\contentsline {subsection}{\numberline {12.2}Technikai megvalósítás C++-ban}{22}{}%
+\contentsline {subsection}{\numberline {12.3}A virtuális destruktor fontossága}{22}{}%
+\contentsline {subsection}{\numberline {12.4}Példa: Állathangok}{22}{}%
+\contentsline {section}{\numberline {13}Ismertesse a „this” pointer alkalmazását a fordító és a felhasználó szemszögéből!}{24}{}%
+\contentsline {subsection}{\numberline {13.1}Fogalma}{24}{}%
+\contentsline {subsection}{\numberline {13.2}1. A Fordító szemszögéből (Implementáció)}{24}{}%
+\contentsline {subsection}{\numberline {13.3}2. A Felhasználó (Programozó) szemszögéből}{24}{}%
+\contentsline {subsection}{\numberline {13.4}Kódpélda a felhasználási esetekre}{24}{}%
+\contentsline {section}{\numberline {14}Ismertesse a „private”, „protected”, „public” módosítók működését az osztálytagok definiálásakor!}{26}{}%
+\contentsline {subsection}{\numberline {14.1}A hozzáférési szintek célja}{26}{}%
+\contentsline {subsection}{\numberline {14.2}A három módosító részletezése}{26}{}%
+\contentsline {subsection}{\numberline {14.3}Összehasonlító táblázat}{26}{}%
+\contentsline {subsection}{\numberline {14.4}Demonstrációs példa}{26}{}%
+\contentsline {section}{\numberline {15}Ismertesse a „const” és „mutable” módosítók működését az osztálytagok definiálásakor!}{28}{}%
+\contentsline {subsection}{\numberline {15.1}Áttekintés}{28}{}%
+\contentsline {subsection}{\numberline {15.2}A const módosító}{28}{}%
+\contentsline {subsection}{\numberline {15.3}A mutable módosító}{28}{}%
+\contentsline {subsection}{\numberline {15.4}Példakód}{29}{}%
+\contentsline {section}{\numberline {16}Ismertesse a statikus adattagok tulajdonságait, megadási és elérési módjait!}{30}{}%
+\contentsline {subsection}{\numberline {16.1}Alapvető tulajdonságok}{30}{}%
+\contentsline {subsection}{\numberline {16.2}Deklaráció és Definíció (Megadás)}{30}{}%
+\contentsline {subsection}{\numberline {16.3}Elérési módok}{30}{}%
+\contentsline {subsection}{\numberline {16.4}Példakód}{30}{}%
+\contentsline {section}{\numberline {17}Ismertesse a „barátság” elvét és típusait az osztályok definiálásánál!}{32}{}%
+\contentsline {subsection}{\numberline {17.1}A barátság (friend) elve}{32}{}%
+\contentsline {subsection}{\numberline {17.2}A barátság típusai}{32}{}%
+\contentsline {subsection}{\numberline {17.3}Példakód}{32}{}%
+\contentsline {section}{\numberline {18}Ismertesse a konstruktor működését! Mely konstruktorokat biztosítja a fordító alapértelmezetten?}{34}{}%
+\contentsline {subsection}{\numberline {18.1}A konstruktor működése}{34}{}%
+\contentsline {subsection}{\numberline {18.2}A fordító által automatikusan biztosított konstruktorok}{34}{}%
+\contentsline {subsection}{\numberline {18.3}Példakód}{35}{}%
+\contentsline {section}{\numberline {19}Ismertesse a konstruktor megadásának szabályait! Milyen esetekben kell felülírnuk a fordító által definiált konstruktorokat?}{36}{}%
+\contentsline {subsection}{\numberline {19.1}A konstruktor megadásának szabályai}{36}{}%
+\contentsline {subsection}{\numberline {19.2}Mikor kell felülírni a fordító által generált konstruktorokat?}{36}{}%
+\contentsline {subsection}{\numberline {19.3}Példakód}{37}{}%
+\contentsline {section}{\numberline {20}Ismertesse az adattagok kezdeti értékmegadásának lehetőségeit! Ezek közül melyik az, amelyik referencia típusú adattagok esetén használható?}{38}{}%
+\contentsline {subsection}{\numberline {20.1}Az értékmegadás lehetőségei}{38}{}%
+\contentsline {subsection}{\numberline {20.2}Referencia típusú adattagok kezelése}{38}{}%
+\contentsline {subsection}{\numberline {20.3}Példakód}{38}{}%
+\contentsline {section}{\numberline {21}Ismertesse példával az 1 paraméterrel rendelkező konstruktor egyszerűsített meghívási lehetőségét! Hogyan tudjuk ezt az egyszerűsítést letiltani?}{40}{}%
+\contentsline {subsection}{\numberline {21.1}Egyszerűsített meghívás (Implicit konverzió)}{40}{}%
+\contentsline {subsection}{\numberline {21.2}Az egyszerűsítés letiltása (explicit)}{40}{}%
+\contentsline {subsection}{\numberline {21.3}Példakód}{40}{}%
+\contentsline {section}{\numberline {22}Ismertesse a másoló konstruktor megírásának szükségességét okozó szituációt! Honnan tudjuk eldönteni, hogy a fordító a másoló konstruktort, vagy az „=” operátort használja?}{42}{}%
+\contentsline {subsection}{\numberline {22.1}Mikor szükséges saját másoló konstruktort írni?}{42}{}%
+\contentsline {subsection}{\numberline {22.2}Másoló konstruktor vs. Értékadó operátor}{42}{}%
+\contentsline {subsection}{\numberline {22.3}Példakód}{42}{}%
+\contentsline {section}{\numberline {23}Ismertesse a destruktor definícióját, a destruktor készítés szabályait! Mit mondhatunk a destruktor kézi meghívásáról?}{44}{}%
+\contentsline {subsection}{\numberline {23.1}Definíció és Szerep}{44}{}%
+\contentsline {subsection}{\numberline {23.2}A készítés szabályai}{44}{}%
+\contentsline {subsection}{\numberline {23.3}A destruktor kézi meghívásáról}{44}{}%
+\contentsline {subsection}{\numberline {23.4}Példakód}{45}{}%
+\contentsline {section}{\numberline {24}Ismertesse a névterek definiálásának szükségességét a C++ programokban! Melyik operátorral hivatkozhatunk egy adott névtérben található osztályra?}{46}{}%
+\contentsline {subsection}{\numberline {24.1}A névterek (Namespaces) szükségessége}{46}{}%
+\contentsline {subsection}{\numberline {24.2}Hivatkozás az elemekre}{46}{}%
+\contentsline {subsection}{\numberline {24.3}Példakód}{46}{}%
+\contentsline {section}{\numberline {25}Ismertesse az osztálypéldányokon végzett műveletek definiálási lehetőségeit! Mely műveleteket nem lehet átdefiniálni?}{48}{}%
+\contentsline {subsection}{\numberline {25.1}Az operátor-túlterhelés (Operator Overloading) lehetőségei}{48}{}%
+\contentsline {subsection}{\numberline {25.2}Nem átdefiniálható operátorok}{48}{}%
+\contentsline {subsection}{\numberline {25.3}Példakód}{48}{}%
+\contentsline {section}{\numberline {26}Ismertesse az osztályok kétoperandusú műveleteinek átdefiniálási lehetőségeit! Írjon példákat minden egyes lehetőséghez!}{50}{}%
+\contentsline {subsection}{\numberline {26.1}Áttekintés}{50}{}%
+\contentsline {subsection}{\numberline {26.2}1. Lehetőség: Tagfüggvényként (Member Function)}{50}{}%
+\contentsline {subsection}{\numberline {26.3}2. Lehetőség: Globális (Barát) függvényként (Global/Friend Function)}{50}{}%
+\contentsline {subsection}{\numberline {26.4}Példakód}{50}{}%
+\contentsline {section}{\numberline {27}Ismertesse az osztályok egyoperandusú műveleteinek átdefiniálási lehetőségeit! Írjon példákat minden egyes lehetőséghez!}{52}{}%
+\contentsline {subsection}{\numberline {27.1}Áttekintés}{52}{}%
+\contentsline {subsection}{\numberline {27.2}1. Lehetőség: Tagfüggvényként (Member Function)}{52}{}%
+\contentsline {subsection}{\numberline {27.3}2. Lehetőség: Globális (Barát) függvényként (Global Function)}{52}{}%
+\contentsline {subsection}{\numberline {27.4}Speciális eset: Prefix vs. Postfix (++ és --)}{52}{}%
+\contentsline {subsection}{\numberline {27.5}Példakód}{52}{}%
+\contentsline {section}{\numberline {28}Ismertesse a kommutatív műveletek átdefiniálási lehetőségét! Miért nem tudjuk a tagfüggvényes módszert alkalmazni?}{54}{}%
+\contentsline {subsection}{\numberline {28.1}A probléma: Miért nem jó a tagfüggvény?}{54}{}%
+\contentsline {subsection}{\numberline {28.2}A megoldás: Globális (Barát) függvény}{54}{}%
+\contentsline {subsection}{\numberline {28.3}Példakód}{54}{}%
+\contentsline {section}{\numberline {29}Ismertesse a „()” operátor túlterhelési lehetőségeit!}{56}{}%
+\contentsline {subsection}{\numberline {29.1}Áttekintés és Tulajdonságok}{56}{}%
+\contentsline {subsection}{\numberline {29.2}Gyakori felhasználási területek}{56}{}%
+\contentsline {subsection}{\numberline {29.3}Példakód}{56}{}%
+\contentsline {section}{\numberline {30}Ismertesse az „=” operátor túlterhelésének szintaktikáját és a szituációt, amelyben a fordító által biztosított operátor nem működik megfelelően!}{58}{}%
+\contentsline {subsection}{\numberline {30.1}Szintaktikai szabályok}{58}{}%
+\contentsline {subsection}{\numberline {30.2}A fordító által biztosított operátor problémája}{58}{}%
+\contentsline {subsection}{\numberline {30.3}Megvalósítási minta (Idiómák)}{58}{}%
+\contentsline {subsection}{\numberline {30.4}Példakód}{59}{}%
+\contentsline {section}{\numberline {31}Ismertesse a „new” és „delete” operátorok túlterhelésének szabályait!}{60}{}%
+\contentsline {subsection}{\numberline {31.1}Alapvető szintaxis és szignatúrák}{60}{}%
+\contentsline {subsection}{\numberline {31.2}Osztályszintű szabályok (Class-specific)}{60}{}%
+\contentsline {subsection}{\numberline {31.3}Globális szabályok (Global scope)}{61}{}%
+\contentsline {subsection}{\numberline {31.4}Kivételkezelés és konvenciók}{61}{}%
+\contentsline {subsection}{\numberline {31.5}Placement New szabályai}{61}{}%
+\contentsline {section}{\numberline {32}Ismertesse az I/O operátorok túlterhelésének szabályait! Írjon példát osztálypéldány kiíratásához!}{62}{}%
+\contentsline {subsection}{\numberline {32.1}Alapvető szabályok és elhelyezkedés}{62}{}%
+\contentsline {subsection}{\numberline {32.2}A függvények szignatúrája}{62}{}%
+\contentsline {subsection}{\numberline {32.3}A „friend” mechanizmus szerepe}{62}{}%
+\contentsline {subsection}{\numberline {32.4}Példa: Komplex szám osztály kiíratása}{63}{}%
+\contentsline {section}{\numberline {33}Ismertesse az „std” névtér „string” osztályát! Adja meg (működés magyarázatával) gyakran használt operátorait és metódusait!}{64}{}%
+\contentsline {subsection}{\numberline {33.1}Általános jellemzők}{64}{}%
+\contentsline {subsection}{\numberline {33.2}Gyakran használt operátorok}{64}{}%
+\contentsline {subsection}{\numberline {33.3}Fontosabb tagfüggvények (metódusok)}{64}{}%
+\contentsline {subsection}{\numberline {33.4}Példa a használatra}{65}{}%
+\contentsline {section}{\numberline {34}Ismertesse a string-numerikus adat közti konverzióra használt osztályt!}{66}{}%
+\contentsline {subsection}{\numberline {34.1}Az osztály jellemzői és felépítése}{66}{}%
+\contentsline {subsection}{\numberline {34.2}Fő metódusok és kezelés}{66}{}%
+\contentsline {subsection}{\numberline {34.3}Konverziós irányok}{66}{}%
+\contentsline {subsection}{\numberline {34.4}Mintapélda}{66}{}%
+\contentsline {section}{\numberline {35}Ismertesse a fájlok kezelésére használt osztályt, gyakran használt metódusait és operátorait!}{68}{}%
+\contentsline {subsection}{\numberline {35.1}Az alapvető osztályok}{68}{}%
+\contentsline {subsection}{\numberline {35.2}Megnyitás és fájlmódok}{68}{}%
+\contentsline {subsection}{\numberline {35.3}Fontos tagfüggvények (Metódusok)}{68}{}%
+\contentsline {subsection}{\numberline {35.4}Operátorok}{68}{}%
+\contentsline {subsection}{\numberline {35.5}Példa: Írás és olvasás}{69}{}%
+\contentsline {section}{\numberline {36}Ismertesse példával a „kompozíció” elvet osztályok egymásba ágyazására!}{70}{}%
+\contentsline {subsection}{\numberline {36.1}A kompozíció elvei}{70}{}%
+\contentsline {subsection}{\numberline {36.2}Megvalósítás C++ nyelven}{70}{}%
+\contentsline {subsection}{\numberline {36.3}Példa: Számítógép és Processzor}{70}{}%
+\contentsline {section}{\numberline {37}Ismertesse az „aggregáció” elvet osztályok egymásba ágyazására!}{72}{}%
+\contentsline {subsection}{\numberline {37.1}Az aggregáció jellemzői}{72}{}%
+\contentsline {subsection}{\numberline {37.2}Megvalósítás C++ nyelven}{72}{}%
+\contentsline {subsection}{\numberline {37.3}Példa: Autó és Sofőr}{72}{}%
+\contentsline {section}{\numberline {38}Ismertesse az „öröklődés” elvet osztályok egymásba ágyazására! Mi az öröklődés szintaktikája a C++-ban?}{74}{}%
+\contentsline {subsection}{\numberline {38.1}Az elv és a kapcsolat típusa}{74}{}%
+\contentsline {subsection}{\numberline {38.2}Szintaktika C++ nyelven}{74}{}%
+\contentsline {subsection}{\numberline {38.3}Származtatási módok (Láthatóság)}{74}{}%
+\contentsline {subsection}{\numberline {38.4}Konstruktorok és Destruktorok sorrendje}{75}{}%
+\contentsline {subsection}{\numberline {38.5}Példa}{75}{}%
+\contentsline {section}{\numberline {39}Csoportosítsa az osztályban található elemeket öröklődési szempontból: mely elemek öröklődnek, és mely elemek nem öröklődnek?}{76}{}%
+\contentsline {subsection}{\numberline {39.1}Örökölt elemek}{76}{}%
+\contentsline {subsection}{\numberline {39.2}Nem örökölt elemek}{76}{}%
+\contentsline {subsection}{\numberline {39.3}Összefoglaló táblázat és példa}{77}{}%
+\contentsline {section}{\numberline {40}Ismertesse öröklődés során a leszármazottban található konstruktor paraméterezésének és hívásának szabályait, tekintettel az ősben levő privát adattagokra!}{78}{}%
+\contentsline {subsection}{\numberline {40.1}A probléma: Privát adattagok elérése}{78}{}%
+\contentsline {subsection}{\numberline {40.2}Konstruktor hívási szabályok}{78}{}%
+\contentsline {subsection}{\numberline {40.3}Kötelezőség és Default konstruktor}{78}{}%
+\contentsline {subsection}{\numberline {40.4}Példa}{78}{}%
+\contentsline {section}{\numberline {41}Ismertesse az ősben található osztálytagok elérésének módosítását private és protected öröklődés során!}{80}{}%
+\contentsline {subsection}{\numberline {41.1}Az alapvető mechanizmus}{80}{}%
+\contentsline {subsection}{\numberline {41.2}Protected (Védett) öröklődés}{80}{}%
+\contentsline {subsection}{\numberline {41.3}Private (Privát) öröklődés}{80}{}%
+\contentsline {subsection}{\numberline {41.4}Összefoglaló táblázat}{81}{}%
+\contentsline {subsection}{\numberline {41.5}Láthatóság visszaállítása (Using declaration)}{81}{}%
+\contentsline {subsection}{\numberline {41.6}Példa a korlátozásokra}{81}{}%
+\contentsline {section}{\numberline {42}Ismertesse az osztálytagok elérését ősosztály típusú pointerrel! Mi a „korai kötés” működése és problémája?}{83}{}%
+\contentsline {subsection}{\numberline {42.1}Az ősosztály típusú mutató viselkedése}{83}{}%
+\contentsline {subsection}{\numberline {42.2}A korai kötés (Early / Static Binding)}{83}{}%
+\contentsline {subsection}{\numberline {42.3}A probléma: A polimorfizmus hiánya}{83}{}%
+\contentsline {subsection}{\numberline {42.4}Példa a hibás működésre}{83}{}%
+\contentsline {section}{\numberline {43}Ismertesse a C++-ban található „többszörös öröklődés” elvet! Az ismertetést ábrával és program-részlettel illusztrálja!}{85}{}%
+\contentsline {subsection}{\numberline {43.1}Alapvető szabályok}{85}{}%
+\contentsline {subsection}{\numberline {43.2}Strukturális Ábra}{85}{}%
+\contentsline {subsection}{\numberline {43.3}Problémák és megoldások}{85}{}%
+\contentsline {subsection}{\numberline {43.4}Példa program}{85}{}%
+\contentsline {section}{\numberline {44}Ismertesse példával a „virtuális metódus” elv működését! Mit tartalmaz a VMT (vftable) táblázat? A leszármazottban is ugyanazt a szintaktikát kell használni a virtuális metódus felülírásakor?}{87}{}%
+\contentsline {subsection}{\numberline {44.1}A működési elv: Késői kötés (Late Binding)}{87}{}%
+\contentsline {subsection}{\numberline {44.2}A VMT (Virtual Method Table) felépítése}{87}{}%
+\contentsline {subsection}{\numberline {44.3}Szintaktika a leszármazottban}{87}{}%
+\contentsline {subsection}{\numberline {44.4}Példa}{88}{}%
+\contentsline {section}{\numberline {45}Ismertesse ábrával a „közvetlen bázisosztály” és a „közvetett bázisosztály” fogalmakat!}{89}{}%
+\contentsline {subsection}{\numberline {45.1}Fogalmak definíciója}{89}{}%
+\contentsline {subsection}{\numberline {45.2}Strukturális Ábra}{89}{}%
+\contentsline {subsection}{\numberline {45.3}Programrészlet és Szintaktika}{89}{}%
+\contentsline {subsection}{\numberline {45.4}Fontos szabályok}{90}{}%
+\contentsline {section}{\numberline {46}Ismertesse ábrával a virtuális öröklődés szükségességét előidéző szituációt!}{91}{}%
+\contentsline {subsection}{\numberline {46.1}A probléma leírása}{91}{}%
+\contentsline {subsection}{\numberline {46.2}Strukturális Ábra (A Rombusz)}{91}{}%
+\contentsline {subsection}{\numberline {46.3}Megoldás: Virtuális öröklődés}{91}{}%
+\contentsline {subsection}{\numberline {46.4}Példa a hibás és javított esetre}{91}{}%
+\contentsline {section}{\numberline {47}Ismertesse a tisztán virtuális metódus készítésének szintaktikáját! Hogyan nevezzük a legalább 1 tisztán virtuális metódust tartalmazó osztályt? Milyen szabályok vonatkoznak erre az osztályra?}{93}{}%
+\contentsline {subsection}{\numberline {47.1}Szintaktika}{93}{}%
+\contentsline {subsection}{\numberline {47.2}Elnevezés}{93}{}%
+\contentsline {subsection}{\numberline {47.3}Az absztrakt osztályra vonatkozó szabályok}{93}{}%
+\contentsline {section}{\numberline {48}Ismertesse az „overload” és „override” elvek közti különbséget, amennyiben ős és leszármazottban történő előfordulásról van szó!}{94}{}%
+\contentsline {subsection}{\numberline {48.1}1. Overload (Túlterhelés)}{94}{}%
+\contentsline {subsection}{\numberline {48.2}2. Override (Felüldefiniálás)}{94}{}%
+\contentsline {subsection}{\numberline {48.3}Összehasonlító táblázat}{94}{}%
+\contentsline {subsection}{\numberline {48.4}Példa a két esetre}{94}{}%
+\contentsline {section}{\numberline {49}Ismertesse a „static\_cast” és „dynamic\_cast” kulcsszavak működését! Hol fordulhat elő hibásan interpretált memória-terület?}{96}{}%
+\contentsline {subsection}{\numberline {49.1}static\_cast (Fordítási idejű konverzió)}{96}{}%
+\contentsline {subsection}{\numberline {49.2}dynamic\_cast (Futásidejű konverzió)}{96}{}%
+\contentsline {subsection}{\numberline {49.3}Hibásan interpretált memória-terület (Veszélyforrás)}{96}{}%
+\contentsline {subsection}{\numberline {49.4}Példa a működésre és a hibára}{97}{}%
+\contentsline {section}{\numberline {50}Ismertesse egy előre megírt programrendszer (netről letöltött, vagy eszközzel kapott SDK) használatának lépéseit C++-ban!}{98}{}%
+\contentsline {subsection}{\numberline {50.1}1. Az állományok előkészítése}{98}{}%
+\contentsline {subsection}{\numberline {50.2}2. Fordítási beállítások (Compiler Settings)}{98}{}%
+\contentsline {subsection}{\numberline {50.3}3. Szerkesztési beállítások (Linker Settings)}{98}{}%
+\contentsline {subsection}{\numberline {50.4}4. Futásidejű feltételek (Runtime)}{98}{}%
+\contentsline {subsection}{\numberline {50.5}Összefoglaló példa (CMake stílusban)}{99}{}%
+\contentsline {section}{\numberline {51}Ismertesse a vector STL tároló tulajdonságait (memória modell, bejárás, bővíthetőség)!}{100}{}%
+\contentsline {subsection}{\numberline {51.1}Memória modell}{100}{}%
+\contentsline {subsection}{\numberline {51.2}Bővíthetőség és Kapacitás}{100}{}%
+\contentsline {subsection}{\numberline {51.3}Bejárás és Elemek elérése}{100}{}%
+\contentsline {subsection}{\numberline {51.4}Példa a működésre}{101}{}%
+\contentsline {section}{\numberline {52}Ismertesse a deque STL tároló tulajdonságait (memória modell, bejárás, bővíthetőség)!}{102}{}%
+\contentsline {subsection}{\numberline {52.1}Memória modell (Szegmentált felépítés)}{102}{}%
+\contentsline {subsection}{\numberline {52.2}Bővíthetőség}{102}{}%
+\contentsline {subsection}{\numberline {52.3}Bejárás és Elérés}{102}{}%
+\contentsline {subsection}{\numberline {52.4}Példa a használatra}{102}{}%
+\contentsline {section}{\numberline {53}Ismertesse a list STL tároló tulajdonságait (memória modell, bejárás, bővíthetőség)!}{104}{}%
+\contentsline {subsection}{\numberline {53.1}Memória modell (Láncolt szerkezet)}{104}{}%
+\contentsline {subsection}{\numberline {53.2}Bővíthetőség és Módosítás}{104}{}%
+\contentsline {subsection}{\numberline {53.3}Bejárás és Elérés}{104}{}%
+\contentsline {subsection}{\numberline {53.4}Példa a használatra}{105}{}%
+\contentsline {section}{\numberline {54}Ismertesse a set, multiset STL tárolók tulajdonságait (memória modell, bejárás, bővíthetőség)!}{106}{}%
+\contentsline {subsection}{\numberline {54.1}Memória modell (Kiegyensúlyozott fa)}{106}{}%
+\contentsline {subsection}{\numberline {54.2}Bővíthetőség és Teljesítmény}{106}{}%
+\contentsline {subsection}{\numberline {54.3}Bejárás és Elérés}{106}{}%
+\contentsline {subsection}{\numberline {54.4}Példa a működésre}{107}{}%
+\contentsline {section}{\numberline {55}Ismertesse a map, multimap STL tárolók tulajdonságait (memória modell, bejárás, bővíthetőség)!}{108}{}%
+\contentsline {subsection}{\numberline {55.1}Memória modell (Fa szerkezet)}{108}{}%
+\contentsline {subsection}{\numberline {55.2}Bővíthetőség és Műveletek}{108}{}%
+\contentsline {subsection}{\numberline {55.3}Bejárás}{108}{}%
+\contentsline {subsection}{\numberline {55.4}Példa a használatra}{109}{}%
+\contentsline {section}{\numberline {56}Ismertesse az STL tároló adaptereket és működésüket! Melyik mire használható?}{110}{}%
+\contentsline {subsection}{\numberline {56.1}1. std::stack (Verem)}{110}{}%
+\contentsline {subsection}{\numberline {56.2}2. std::queue (Sor)}{110}{}%
+\contentsline {subsection}{\numberline {56.3}3. std::priority\_queue (Prioritásos sor)}{111}{}%
+\contentsline {subsection}{\numberline {56.4}Példa a használatra}{111}{}%
+\contentsline {section}{\numberline {57}Ismertesse az STL iterátorok működését és feladatát egy lista STL tároló esetén!}{113}{}%
+\contentsline {subsection}{\numberline {57.1}Az iterátor feladata és fogalma}{113}{}%
+\contentsline {subsection}{\numberline {57.2}Működés std::list esetén (Láncolt lista)}{113}{}%
+\contentsline {subsection}{\numberline {57.3}Az iterátor kategóriája: Kétirányú (Bidirectional)}{113}{}%
+\contentsline {subsection}{\numberline {57.4}Iterátor érvényesség (Iterator Validity)}{113}{}%
+\contentsline {subsection}{\numberline {57.5}Példa a használatra}{114}{}%
+\contentsline {section}{\numberline {58}Ismertesse az STL tárolókon végrehajtható algoritmusok működését és testre szabási lehetőségeiket!}{115}{}%
+\contentsline {subsection}{\numberline {58.1}Működési elv: Az iterátorok szerepe}{115}{}%
+\contentsline {subsection}{\numberline {58.2}Algoritmus típusok}{115}{}%
+\contentsline {subsection}{\numberline {58.3}Testre szabás (Customization)}{115}{}%
+\contentsline {subsection}{\numberline {58.4}Példa: Rendezés és Keresés testre szabása}{116}{}%
+\contentsline {section}{\numberline {59}Ismertesse a „nyelvi változó”, „karakterisztikus függvény” és a „tagsági függvény” fogalmakat Zadeh szerint!}{117}{}%
+\contentsline {subsection}{\numberline {59.1}1. Karakterisztikus függvény (Hagyományos halmazok)}{117}{}%
+\contentsline {subsection}{\numberline {59.2}2. Tagsági függvény (Fuzzy halmazok)}{117}{}%
+\contentsline {subsection}{\numberline {59.3}3. Nyelvi változó (Linguistic Variable)}{117}{}%
+\contentsline {subsection}{\numberline {59.4}Összefüggés a fogalmak között}{118}{}%
+\contentsline {section}{\numberline {60}Ismertesse példával azt a szituációt, amikor egy fuzzy partíció lefedi az alaphalmazt! Adja meg a szöveges definíciót is!}{119}{}%
+\contentsline {subsection}{\numberline {60.1}Szöveges és Formális Definíció}{119}{}%
+\contentsline {subsection}{\numberline {60.2}Gyakorlati Példa: Víz hőmérséklet szabályozás}{119}{}%
+\contentsline {section}{\numberline {61}Ismertesse ábrával a „mag”, „tartó”, „$\alpha $ vágat”, „szigorú $\alpha $ vágat” és „magasság” fogalmakat a fuzzy halmazok esetén!}{120}{}%
+\contentsline {subsection}{\numberline {61.1}Szemléltető Ábra}{120}{}%
+\contentsline {subsection}{\numberline {61.2}Definíciók}{120}{}%
+\contentsline {section}{\numberline {62}Ismertesse a Zadeh szerinti „s-norma”, „t-norma” és komplemens képzését fuzzy halmazoknál!}{122}{}%
+\contentsline {subsection}{\numberline {62.1}1. Fuzzy Komplemens (Tagadás)}{122}{}%
+\contentsline {subsection}{\numberline {62.2}2. T-norma (Fuzzy Metszet / ÉS)}{122}{}%
+\contentsline {subsection}{\numberline {62.3}3. S-norma (Fuzzy Unió / VAGY)}{122}{}%
+\contentsline {subsection}{\numberline {62.4}Összefüggés: De Morgan azonosságok}{123}{}%
+\contentsline {subsection}{\numberline {62.5}Implementációs példa}{123}{}%
+\contentsline {section}{\numberline {63}Ismertesse, hogy mikor alkalmazható egy t-norma, s-norma, komplemens definicióit tartalmazó szabályrendszer fuzzy halmazműveletekhez! Mit alkotnak ilyenkor a szabályrendszer elemei?}{124}{}%
+\contentsline {subsection}{\numberline {63.1}Alkalmazhatóság feltétele: A De Morgan Hármas}{124}{}%
+\contentsline {subsection}{\numberline {63.2}Mit alkotnak az elemek?}{124}{}%
+\contentsline {section}{\numberline {64}Ismertesse a fuzzy rendszerek általános blokkvázlatát!}{126}{}%
+\contentsline {subsection}{\numberline {64.1}A rendszer felépítése (Strukturális ábra)}{126}{}%
+\contentsline {subsection}{\numberline {64.2}1. Fuzzifikáló egység (Fuzzification Interface)}{126}{}%
+\contentsline {subsection}{\numberline {64.3}2. Tudásbázis (Knowledge Base)}{126}{}%
+\contentsline {subsection}{\numberline {64.4}3. Következtető motor (Inference Engine)}{126}{}%
+\contentsline {subsection}{\numberline {64.5}4. Defuzzifikáló egység (Defuzzification Interface)}{127}{}%
+\contentsline {section}{\numberline {65}Ismertesse példával a fuzzy következtető módszer működését!}{128}{}%
+\contentsline {subsection}{\numberline {65.1}A példa paraméterei}{128}{}%
+\contentsline {subsection}{\numberline {65.2}1. Lépés: Fuzzifikálás (Fuzzification)}{128}{}%
+\contentsline {subsection}{\numberline {65.3}2. Lépés: Kiértékelés (Inference / Implication)}{128}{}%
+\contentsline {subsection}{\numberline {65.4}3. Lépés: Aggregáció (Aggregation)}{128}{}%
+\contentsline {subsection}{\numberline {65.5}4. Lépés: Defuzzifikálás (Defuzzification)}{129}{}%
+\contentsline {subsection}{\numberline {65.6}Programkód (Szimuláció)}{129}{}%
+\contentsline {section}{\numberline {66}Ismertessen defuzzifikációs módszereket!}{130}{}%
+\contentsline {subsection}{\numberline {66.1}1. Súlypont módszer (Center of Gravity - COG)}{130}{}%
+\contentsline {subsection}{\numberline {66.2}2. Maximum középérték módszer (Mean of Maxima - MOM)}{130}{}%
+\contentsline {subsection}{\numberline {66.3}3. Egyéb maximum-alapú módszerek}{130}{}%
+\contentsline {subsection}{\numberline {66.4}4. Összegsúlypont módszer (Center of Sums - COS)}{131}{}%
+\contentsline {subsection}{\numberline {66.5}Összehasonlító példa kódban}{131}{}%
+\contentsline {section}{\numberline {67}Ismertesse az aggregációs operátorok definícióját, és 5 axiómáját!}{132}{}%
+\contentsline {subsection}{\numberline {67.1}Definíció}{132}{}%
+\contentsline {subsection}{\numberline {67.2}Az 5 alapvető axióma (Tulajdonság)}{132}{}%
+\contentsline {subsection}{\numberline {67.3}Osztályozás az idempotencia alapján}{132}{}%
+\contentsline {section}{\numberline {68}Ismertesse az általános hatványközép operátort, és a paraméter speciális eseteiben elnevezett értékeit!}{133}{}%
+\contentsline {subsection}{\numberline {68.1}Definíció}{133}{}%
+\contentsline {subsection}{\numberline {68.2}Speciális esetek (Nevezetes közepek)}{133}{}%
+\contentsline {subsection}{\numberline {68.3}Tulajdonságok}{134}{}%
+\contentsline {section}{\numberline {69}Ismertesse az OWA operátort!}{135}{}%
+\contentsline {subsection}{\numberline {69.1}Definíció}{135}{}%
+\contentsline {subsection}{\numberline {69.2}A legfontosabb különbség a Súlyozott Átlaghoz képest}{135}{}%
+\contentsline {subsection}{\numberline {69.3}Speciális esetek (A súlyvektor függvényében)}{135}{}%
+\contentsline {subsection}{\numberline {69.4}Jellemzők: Orness és Diszperzió}{135}{}%
+\contentsline {subsection}{\numberline {69.5}Számítási Példa}{136}{}%

@@ -1,0 +1,89 @@
+\section{Ismertesse a vector STL tároló tulajdonságait (memória modell, bejárás, bővíthetőség)!}
+
+Az \texttt{std::vector} a C++ Standard Template Library (STL) legfontosabb és leggyakrabban használt soros tárolója. Lényegében egy dinamikusan méreteződő tömböt valósít meg, amely ötvözi a statikus tömbök gyors elérését a listák rugalmasságával.
+
+\subsection{Memória modell}
+
+A \texttt{vector} legfontosabb tulajdonsága a fizikai memóriában való elhelyezkedése:
+
+\begin{itemize}
+    \item \textbf{Folytonos tárterület (Contiguous memory):} Az elemeket a memóriában egymás után, megszakítás nélkül tárolja (mint egy C tömb).
+    \item \textbf{Előnyei:}
+        \begin{itemize}
+            \item \textbf{Gyors elérés:} Támogatja a pointer-aritmetikát.
+            \item \textbf{Cache-barát:} A processzor gyorsítótára hatékonyan tudja előtölteni az adatokat (spatial locality).
+            \item \textbf{Kompatibilitás:} Átadhatjuk olyan C függvényeknek, amelyek nyers tömböt (\texttt{T*}) várnak (ehhez a \texttt{data()} tagfüggvényt használjuk).
+        \end{itemize}
+    \item \textbf{Méretek:} 
+        \begin{itemize}
+            \item Egy vektor objektum a stack-en csak egy „adminisztrációs” részt tárol (általában 3 pointert: kezdet, vége, foglalt terület vége), a tényleges adatok a \textbf{heap}-en (kupacon) vannak.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Bővíthetőség és Kapacitás}
+
+A vektor automatikusan kezeli a memóriafoglalást, de fontos megkülönböztetni két fogalmat:
+
+\begin{itemize}
+    \item \textbf{Size (Méret):} A ténylegesen tárolt elemek száma (\texttt{size()}).
+    \item \textbf{Capacity (Kapacitás):} A lefoglalt, de még nem feltétlenül használt memória mérete (\texttt{capacity()}).
+\end{itemize}
+
+\textbf{Az újrafoglalás (Reallocation) mechanizmusa:}
+Amikor új elemet adunk hozzá (\texttt{push\_back}), és \texttt{size == capacity}:
+\begin{enumerate}
+    \item A vektor egy \textbf{új}, nagyobb memóriaterületet foglal le (általában a korábbi méret 2-szeresét).
+    \item \textbf{Átmásolja} (vagy mozgatja) a régi elemeket az új helyre.
+    \item \textbf{Felszabadítja} a régi memóriaterületet.
+    \item Beilleszti az új elemet.
+\end{enumerate}
+
+\textit{Megjegyzés:} Ez a művelet költséges ($O(N)$), de mivel ritkán történik, a beszúrás átlagos (amortizált) költsége konstans ($O(1)$). A felesleges másolások elkerülésére használjuk a \texttt{reserve(n)} függvényt, ha előre sejtjük az elemszámot.
+
+\subsection{Bejárás és Elemek elérése}
+
+Mivel a memória folytonos, a vektor támogatja a \textbf{véletlen elérést (Random Access)}.
+
+\begin{itemize}
+    \item \textbf{Indexelés (\texttt{[]}):} Gyors ($O(1)$), de nem végez határellenőrzést (túlindexelés esetén undefined behavior).
+    \item \textbf{Biztonságos elérés (\texttt{at()}):} Határellenőrzést végez, hiba esetén \texttt{std::out\_of\_range} kivételt dob (lassabb).
+    \item \textbf{Iterátorok:} \textit{Random Access Iterator}-t biztosít (\texttt{begin()}, \texttt{end()}), így pointer-szerűen léptethető és tetszőleges távolságra ugorhatunk vele.
+\end{itemize}
+
+\subsection{Példa a működésre}
+
+\begin{minted}{cpp}
+#include <iostream>
+#include <vector>
+
+int main() {
+    // 1. Létrehozás
+    std::vector<int> szamok;
+    
+    // Optimalizáció: Előre foglalunk helyet 10 elemnek
+    // Így elkerüljük a többszöri átmásolást a ciklusban
+    szamok.reserve(10); 
+
+    // 2. Feltöltés (Bővítés)
+    for (int i = 0; i < 5; ++i) {
+        szamok.push_back(i * 10);
+        // Itt a size nő, a capacity 10 marad
+    }
+
+    // 3. Bejárás (Range-based for loop - C++11)
+    std::cout << "Elemek: ";
+    for (const int& x : szamok) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // 4. Memória állapot
+    std::cout << "Size: " << szamok.size() << std::endl;         // 5
+    std::cout << "Capacity: " << szamok.capacity() << std::endl; // 10
+
+    // 5. Közvetlen elérés
+    szamok[2] = 99; // 3. elem módosítása
+    
+    return 0;
+}
+\end{minted}

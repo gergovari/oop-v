@@ -1,0 +1,72 @@
+\section{Ismertesse az „öröklődés” objektum-orientált elvet!}
+
+\subsection{Fogalma és Lényege}
+\begin{itemize}
+    \item \textbf{Definíció:} Az öröklődés (Inheritance) lehetővé teszi, hogy egy meglévő osztály (ős) tulajdonságait és viselkedését egy új osztály (utód) átvegye.
+    \item \textbf{Cél:} A kód újrahasznosítása és a hierarchikus rendszerezés. Nem kell újra leírni a közös kódrészleteket.
+    \item \textbf{"Is-a" kapcsolat:} Az öröklés "ez egy..." (is-a) kapcsolatot valósít meg. Például: Az \textit{Autó} (utód) egy \textit{Jármű} (ős).
+\end{itemize}
+
+\subsection{Terminológia}
+\begin{itemize}
+    \item \textbf{Ősosztály (Base class / Super class):} Az az osztály, amelynek a tulajdonságait örökítjük.
+    \item \textbf{Származtatott osztály (Derived class / Sub class):} Az új osztály, amely örökli az ős tulajdonságait, és általában újakkal egészíti ki azokat.
+\end{itemize}
+
+\subsection{A \texttt{protected} (Védett) hozzáférés szerepe}
+Az öröklésnél megjelenik egy harmadik láthatósági szint:
+\begin{itemize}
+    \item \textbf{\texttt{protected}:} A külvilág számára rejtett (mint a private), de a származtatott osztályok számára látható és módosítható.
+\end{itemize}
+
+\subsection{Szintaxis és Példa}
+C++-ban az osztály neve után kettősponttal és a hozzáférési mód megadásával (általában \texttt{public}) jelöljük az öröklést.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+// ŐSOSZTÁLY (Szülő)
+class Jarmu {
+protected:
+    int sebesseg; // A leszármazottak látják, a main() nem
+
+public:
+    Jarmu() : sebesseg(0) {}
+
+    void indul() {
+        std::cout << "A jarmu elindult." << std::endl;
+    }
+};
+
+// SZÁRMAZTATOTT OSZTÁLY (Gyerek)
+// Az Auto örökli a Jarmu minden tulajdonságát
+class Auto : public Jarmu {
+public:
+    void gazadas() {
+        // Hozzáférünk az ős 'protected' adattagjához
+        sebesseg += 10; 
+        std::cout << "Sebesseg: " << sebesseg << " km/h" << std::endl;
+    }
+    
+    // Saját, új funkció, ami az ősben nem volt
+    void dudal() {
+        std::cout << "Tu-tu!" << std::endl;
+    }
+};
+
+int main() {
+    Auto kocsi;
+
+    // 1. Az ősosztály metódusát is tudja használni
+    kocsi.indul(); 
+
+    // 2. A saját metódusait is tudja használni
+    kocsi.gazadas();
+    kocsi.dudal();
+
+    return 0;
+}
+\end{minted}
+
+\subsection{Összegzés}
+Az \texttt{Auto} osztálynak nem kellett újra definiálnia a \texttt{sebesseg} változót vagy az \texttt{indul()} függvényt, azokat "ingyen" megkapta a \texttt{Jarmu} osztálytól, így a kód rövidebb és átláthatóbb.

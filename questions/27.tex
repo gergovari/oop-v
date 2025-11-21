@@ -1,0 +1,86 @@
+\section{Ismertesse az osztályok egyoperandusú műveleteinek átdefiniálási lehetőségeit! Írjon példákat minden egyes lehetőséghez!}
+
+\subsection{Áttekintés}
+Az egyoperandusú (unáris) operátorok (pl. \texttt{++}, \texttt{--}, \texttt{-} (negálás), \texttt{!}) egyetlen objektumon fejtik ki hatásukat. Ezen operátorok túlterhelésére két fő lehetőség van, illetve egy speciális szabály vonatkozik a prefix/postfix megkülönböztetésre.
+
+\subsection{1. Lehetőség: Tagfüggvényként (Member Function)}
+Ha az operátort az osztály tagjaként definiáljuk:
+\begin{itemize}
+    \item \textbf{Paraméterek száma:} Általában \textbf{0 paramétere} van.
+    \item \textbf{Operandus:} Az operátor implicit módon az aktuális objektumon (\texttt{*this}) hajtódik végre.
+    \item \textbf{Előnye:} Közvetlenül hozzáfér a privát adattagokhoz, nem kell \texttt{friend} deklaráció.
+\end{itemize}
+
+\subsection{2. Lehetőség: Globális (Barát) függvényként (Global Function)}
+Ha az operátort az osztályon kívül definiáljuk:
+\begin{itemize}
+    \item \textbf{Paraméterek száma:} \textbf{1 paramétere} van (az osztály típusú objektum referenciája).
+    \item \textbf{Operandus:} A függvény paraméterként kapja meg az objektumot.
+    \item \textbf{Használat:} Gyakran \texttt{friend}-ként deklarálják az osztályban a hozzáférés miatt.
+\end{itemize}
+
+\subsection{Speciális eset: Prefix vs. Postfix (++ és --)}
+Mivel a \texttt{++a} (prefix) és \texttt{a++} (postfix) operátorok ugyanazt a jelet használják, a C++ egy mesterséges paraméterrel különbözteti meg őket:
+\begin{itemize}
+    \item \textbf{Prefix (Előtag):} Nincs paraméter (vagy globálisnál 1 db referencia). Referenciával tér vissza a módosított objektumra.
+    \item \textbf{Postfix (Utótag):} Egy \textbf{fiktív \texttt{int} paramétert} kap. Értékkel tér vissza (a módosítás előtti állapottal).
+\end{itemize}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a három leggyakoribb esetet: a negálást globális függvényként, valamint a prefix és postfix inkrementálást tagfüggvényként.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+
+class Szam {
+private:
+    int ertek;
+
+public:
+    Szam(int v = 0) : ertek(v) {}
+
+    // 1. ESET: Prefix inkrementálás (++obj) TAGFÜGGVÉNYKÉNT
+    // Nincs paraméter.
+    // Előbb növelünk, aztán visszaadjuk önmagát referenciaként.
+    Szam& operator++() {
+        this->ertek += 1;
+        return *this;
+    }
+
+    // 2. ESET: Postfix inkrementálás (obj++) TAGFÜGGVÉNYKÉNT
+    // A "dummy" int paraméter jelzi a fordítónak, hogy ez postfix.
+    // Elmentjük a régit, növelünk, visszaadjuk a régit érték szerint.
+    Szam operator++(int) {
+        Szam regi = *this; // Másolat készítése
+        this->ertek += 1;  // Növelés
+        return regi;       // Régi érték visszaadása
+    }
+
+    // Kiíratáshoz
+    void print() const { std::cout << "Ertek: " << ertek << std::endl; }
+
+    // Barát deklaráció a globális negáláshoz
+    friend Szam operator-(const Szam& sz);
+};
+
+// 3. ESET: Negálás (-obj) GLOBÁLIS FÜGGVÉNYKÉNT
+// Egy paramétert kap. Új objektumot ad vissza.
+Szam operator-(const Szam& sz) {
+    return Szam(-sz.ertek);
+}
+
+int main() {
+    Szam n(10);
+
+    ++n;       // Prefix hívás (most 11)
+    n.print();
+
+    n++;       // Postfix hívás (most 12, de a kifejezés értéke 11 volt)
+    n.print();
+
+    Szam neg = -n; // Globális unáris mínusz hívása (-12)
+    neg.print();
+
+    return 0;
+}
+\end{minted}

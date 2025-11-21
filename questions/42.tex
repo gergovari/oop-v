@@ -1,0 +1,79 @@
+\section{Ismertesse az osztálytagok elérését ősosztály típusú pointerrel! Mi a „korai kötés” működése és problémája?}
+
+A C++ polimorfizmusának alapja, hogy egy ősosztály típusú mutató (\texttt{Base*}) képes tárolni egy leszármazott osztály (\texttt{Derived}) példányának címét. Ennek kezelése azonban szigorú szabályokhoz kötött.
+
+\subsection{Az ősosztály típusú mutató viselkedése}
+
+Amikor egy \texttt{Base*} típusú mutatón keresztül érünk el egy \texttt{Derived} objektumot:
+
+\begin{itemize}
+    \item \textbf{Láthatósági korlát (Interface Slicing):} A mutatón keresztül kizárólag azok a tagok (változók és függvények) érhetők el, amelyek az \textbf{ősosztályban} deklarálva vannak.
+    \item \textbf{Leszármazott tagjai:} A leszármazottban hozzáadott \textit{új} adattagok és metódusok a fordító számára „láthatatlanok” maradnak ezen a mutatón keresztül (bár a memóriában ott vannak).
+    \item \textbf{Cél:} Ez biztosítja a típusbiztonságot; a fordító garantálja, hogy amit meghívunk, az biztosan létezik az ős interfészében.
+\end{itemize}
+
+\subsection{A korai kötés (Early / Static Binding)}
+
+A korai kötés a C++ alapértelmezett működési módja (ha nem használunk \texttt{virtual} kulcsszót).
+
+\begin{itemize}
+    \item \textbf{Működése:} A fordítóprogram \textbf{fordítási időben} (compile time) dönti el, hogy egy függvényhívás melyik memóriacímen lévő kódra ugorjon.
+    \item \textbf{Döntés alapja:} A döntés kizárólag a mutató \textbf{statikus típusán} alapul (annak a típusnak, aminek deklaráltuk a változót), nem pedig azon, hogy futásidőben milyen objektumra mutat.
+    \item \textbf{Sebesség:} Ez a leggyorsabb hívási mód, mivel nincs futásidejű adminisztráció (vtable keresés).
+\end{itemize}
+
+\subsection{A probléma: A polimorfizmus hiánya}
+
+Ha a leszármazott osztályban felüldefiniálunk (override) egy metódust, de az ősben nem jelöltük \texttt{virtual}-ként, a korai kötés logikai hibához vezethet:
+
+\begin{itemize}
+    \item \textbf{A jelenség:} Hiába tartalmazza a memória a \texttt{Derived} objektumot a saját, módosított metódusával, a \texttt{Base*} mutató miatt a fordító az ősosztály metódusát ("régi kód") köti be.
+    \item \textbf{Eredmény:} Az objektum nem az elvárt (specifikus), hanem az általános (ős) viselkedést mutatja. Ez ellehetetleníti a valódi polimorf működést.
+\end{itemize}
+
+\subsection{Példa a hibás működésre}
+
+Az alábbi példában a \texttt{koszon()} függvényt felüldefiniáltuk, de a \texttt{virtual} kulcsszó hiánya miatt a korai kötés érvényesül.
+
+\begin{minted}{cpp}
+#include <iostream>
+
+class Ember {
+public:
+    // Nincs 'virtual' -> Korai kötés
+    void koszon() { 
+        std::cout << "Szia, ember vagyok!" << std::endl; 
+    }
+};
+
+class Diak : public Ember {
+public:
+    // Hiába definiáljuk felül
+    void koszon() { 
+        std::cout << "Jo napot, diak vagyok!" << std::endl; 
+    }
+    
+    void tanul() { std::cout << "Tanulok..." << std::endl; }
+};
+
+int main() {
+    Diak* d = new Diak();
+    
+    // 1. Eset: Diák mutató
+    d->koszon(); // Kiírja: "Jo napot, diak vagyok!" (Helyes)
+    d->tanul();  // Eléri az új metódust is
+
+    // 2. Eset: Ős (Ember) mutató
+    Ember* e = d; // Ugyanarra a Diák objektumra mutat!
+    
+    // A PROBLÉMA ITT LÁTHATÓ:
+    // A fordító csak azt látja, hogy 'e' egy Ember*.
+    // Ezért az Ember::koszon() függvényt hívja meg fixen.
+    e->koszon(); // Kiírja: "Szia, ember vagyok!" (Helytelen/Nem elvárt)
+    
+    // e->tanul(); // HIBA: Az 'Ember' osztályban nincs 'tanul'
+    
+    delete d;
+    return 0;
+}
+\end{minted}

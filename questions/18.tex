@@ -1,0 +1,87 @@
+\section{Ismertesse a konstruktor működését! Mely konstruktorokat biztosítja a fordító alapértelmezetten?}
+
+\subsection{A konstruktor működése}
+A konstruktor egy speciális tagfüggvény, amelynek feladata az objektum inicializálása (kezdeti állapotba hozása) a példányosítás pillanatában.
+
+\begin{itemize}
+    \item \textbf{Szintaxis:} A neve megegyezik az osztály nevével, és \textbf{nincs visszatérési típusa} (még \texttt{void} sem).
+    \item \textbf{Hívás:} Automatikusan hívódik meg, amikor az objektum létrejön (stack-en, vagy \texttt{new} operátorral a heap-en).
+    \item \textbf{Túlterhelhető (Overloading):} Egy osztálynak több konstruktora is lehet, eltérő paraméterlistával.
+    \item \textbf{Taginicializáló lista (Member Initializer List):}
+    \begin{itemize}
+        \item A konstruktor törzse \textit{előtt} fut le (\texttt{:} után felsorolva).
+        \item Ez az egyetlen mód a \texttt{const}, referencia típusú, vagy paraméter nélküli konstruktorral nem rendelkező tagok inicializálására.
+        \item Hatékonyabb, mint a törzsben történő értékadás (ott már a \textit{default} konstruktor utáni felülírás történne).
+    \end{itemize}
+\end{itemize}
+
+\subsection{A fordító által automatikusan biztosított konstruktorok}
+Ha a fejlesztő nem ír sajátot, a fordító (bizonyos szabályok mellett) automatikusan generálja (implicit) a következőket \texttt{public} és \texttt{inline} láthatósággal:
+
+\begin{enumerate}
+    \item \textbf{Alapértelmezett (Default) konstruktor:}
+    \begin{itemize}
+        \item \textbf{Szignatúra:} \texttt{Osztaly()} (paraméter nélküli).
+        \item \textbf{Működés:} Meghívja az ősosztályok és adattagok alapértelmezett konstruktorait.
+        \item \textbf{Szabály:} Csak akkor generálódik, ha \textbf{semmilyen} más konstruktort nem deklaráltunk.
+    \end{itemize}
+
+    \item \textbf{Másoló (Copy) konstruktor:}
+    \begin{itemize}
+        \item \textbf{Szignatúra:} \texttt{Osztaly(const Osztaly\& other)}.
+        \item \textbf{Működés:} Tagról-tagra másolást végez (\textit{shallow copy}). Pointerek esetén ez veszélyes lehet (ugyanoda mutatnak).
+        \item \textbf{Szabály:} Generálódik, ha nem tiltjuk le, vagy nem írunk mozgató műveleteket.
+    \end{itemize}
+
+    \item \textbf{Mozgató (Move) konstruktor (C++11 óta):}
+    \begin{itemize}
+        \item \textbf{Szignatúra:} \texttt{Osztaly(Osztaly\&\& other)}.
+        \item \textbf{Működés:} Az erőforrásokat (pl. pointereket) „átlopja” az ideiglenes objektumból a másolás helyett.
+        \item \textbf{Szabály:} Csak akkor generálódik, ha nincs felhasználó által deklarált másoló művelet, destruktor vagy mozgató értékadás.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Példakód}
+Az alábbi példa bemutatja a konstruktorok fajtáit és az inicializáló lista használatát.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+#include <iostream>
+#include <string>
+
+class Data {
+    int* buffer;
+    const int size; // Csak listában inicializálható!
+
+public:
+    // 1. Felhasználói konstruktor (inicializáló listával)
+    Data(int s) : size(s) {
+        buffer = new int[size];
+        std::cout << "Konstruktor: memoria foglalasa" << std::endl;
+    }
+
+    // 2. Másoló konstruktor (Deep Copy megvalósítása)
+    // Ha nem írnánk meg, az alapértelmezett csak a pointert másolná!
+    Data(const Data& other) : size(other.size) {
+        buffer = new int[size];
+        for(int i=0; i < size; i++) buffer[i] = other.buffer[i];
+        std::cout << "Masolo konstruktor" << std::endl;
+    }
+
+    // 3. Mozgató konstruktor (C++11)
+    Data(Data&& other) noexcept : size(other.size), buffer(other.buffer) {
+        other.buffer = nullptr; // Az eredetit lenullázzuk
+        std::cout << "Mozgato konstruktor" << std::endl;
+    }
+
+    ~Data() { delete[] buffer; }
+};
+
+int main() {
+    Data d1(10);          // Sima konstruktor
+    Data d2 = d1;         // Másoló konstruktor
+    Data d3 = std::move(d1); // Mozgató konstruktor
+    
+    // Data d4; // HIBA: Nincs default ctor, mert írtunk mást!
+    return 0;
+}
+\end{minted}

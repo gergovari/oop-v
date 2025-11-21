@@ -1,0 +1,67 @@
+\section{Ismertesse a C++ nyelvben a függvények alapértelmezett paraméterezésének lehetőségét, és ennek szabályait!}
+
+\subsection{Fogalma és Célja}
+\begin{itemize}
+    \item \textbf{Definíció:} Lehetőség arra, hogy a függvény paramétereinek előre megadott (default) értéket rendeljünk.
+    \item \textbf{Működés:} Ha a függvényhívás során a hívó fél nem ad meg argumentumot az adott paraméterhez, a fordító automatikusan az alapértelmezett értéket illeszti be.
+    \item \textbf{Haszna:}
+    \begin{itemize}
+        \item Függvénytúlterhelés (function overloading) egyszerűsítése vagy kiváltása.
+        \item A kód olvashatóságának növelése.
+        \item Meglévő függvények bővítése új paraméterekkel a meglévő hívások "eltörése" nélkül.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Szintaxis}
+Az alapértelmezett értéket az értékadó operátorral (\texttt{=}) adjuk meg a paraméter típusát és nevét követően.
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+// Deklaráció (prototípus)
+void ablakNyit(int szelesseg, int magassag, bool teljesKepernyo = false);
+
+// Hívások
+ablakNyit(800, 600);        // teljesKepernyo = false (alapértelmezett)
+ablakNyit(1920, 1080, true); // teljesKepernyo = true (felülírt)
+\end{minted}
+
+\subsection{Alapvető Szabályok}
+Az alábbi szabályok ismerete elengedhetetlen a helyes használathoz:
+
+\begin{enumerate}
+    \item \textbf{Jobbról-balra szabály (Right-to-left rule):}
+    Ha egy paraméternek alapértelmezett értéket adunk, akkor az \textbf{összes} utána következő (tőle jobbra lévő) paraméternek is rendelkeznie kell alapértelmezett értékkel.
+    
+    \item \textbf{Deklaráció vs. Definíció:}
+    Az alapértelmezett értékeket általában a függvény \textbf{deklarációjában} (header fájlban, prototípusban) adjuk meg.
+    \begin{itemize}
+        \item Ha a definíció (implementáció) külön van, ott \textbf{TILOS} megismételni az alapértékeket (fordítási hiba, még akkor is, ha ugyanazt az értéket írnánk be).
+    \end{itemize}
+    
+    \item \textbf{Argumentumok elhagyása:}
+    Argumentumokat csak a paraméterlista \textbf{végéről} hagyhatunk el. Nem lehet "lyukasan" paraméterezni (pl. az elsőt és harmadikat megadjuk, de a középsőt az alapértékre bízzuk).
+\end{enumerate}
+
+\newpage
+\subsection{Kódpélda a szabályokra}
+
+\begin{minted}[frame=lines, framesep=2mm, baselinestretch=1.2, fontsize=\footnotesize, linenos]{cpp}
+// HELYES: Jobbról balra haladva mindenki kapott értéket
+void teszt(int a, int b = 5, int c = 10);
+
+// HELYTELEN: 'b'-nek van default értéke, de a tőle jobbra lévő 'c'-nek nincs
+// void hibas(int a, int b = 5, int c); // -> Fordítási hiba!
+
+// Implementáció: Itt már NEM szerepelnek az egyenlőségjelek
+void teszt(int a, int b, int c) {
+    // ... kód ...
+}
+
+int main() {
+    teszt(1);       // a=1, b=5, c=10
+    teszt(1, 2);    // a=1, b=2, c=10
+    teszt(1, 2, 3); // a=1, b=2, c=3
+    
+    // teszt(1, , 3); // -> Fordítási hiba! (nem lehet kihagyni a közepét)
+    return 0;
+}
+\end{minted}

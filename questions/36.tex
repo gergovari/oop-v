@@ -1,0 +1,70 @@
+\section{Ismertesse példával a „kompozíció” elvet osztályok egymásba ágyazására!}
+
+A kompozíció (összetétel) az objektumorientált programozás egyik alapvető építőköve, amely a „tartalmazás” (vagy „has-a”, azaz „van neki”) kapcsolatot valósítja meg két osztály között.
+
+\subsection{A kompozíció elvei}
+
+\begin{itemize}
+    \item \textbf{„Has-a” kapcsolat:} Az öröklődéssel ellentétben (ami „is-a” típusú), itt az egyik objektum birtokolja a másikat (pl. a Számítógépnek \textit{van} Processzora).
+    \item \textbf{Szoros csatolás (Strong association):} A tartalmazott objektum (rész) élettartama függ a tartalmazó objektum (egész) élettartamától. Ha az „egész” megszűnik, a „rész” is megsemmisül.
+    \item \textbf{Újrafelhasználhatóság:} Lehetővé teszi bonyolult objektumok felépítését egyszerűbb, már meglévő osztályokból.
+\end{itemize}
+
+\subsection{Megvalósítás C++ nyelven}
+
+Technikailag a kompozíciót úgy valósítjuk meg, hogy egy osztály típusú változót adattagként deklarálunk egy másik osztályban.
+
+\begin{itemize}
+    \item \textbf{Adattag:} Az objektumot érték szerint tároljuk (nem mutatóként), így a memóriakezelést a fordító automatikusan végzi.
+    \item \textbf{Member Initializer List:} A tartalmazott objektum konstruktorát a tartalmazó osztály konstruktorának inicializáló listájában kell meghívni. Ez kritikus fontosságú, ha a belső objektumnak nincs paraméter nélküli (default) konstruktora.
+\end{itemize}
+
+\subsection{Példa: Számítógép és Processzor}
+
+Az alábbi példában a \texttt{Szamitogep} osztály kompozícióval tartalmazza a \texttt{CPU} osztályt. A CPU inicializálása a Számítógép létrehozásakor történik.
+
+\begin{minted}{cpp}
+#include <iostream>
+
+// A "rész" osztály
+class CPU {
+    int frekvencia;
+public:
+    // Nincs default konstruktor, paraméter kötelező
+    CPU(int freq) : frekvencia(freq) {
+        std::cout << "CPU beepitve: " << frekvencia << " MHz" << std::endl;
+    }
+
+    void dolgozik() {
+        std::cout << "CPU szamol..." << std::endl;
+    }
+};
+
+// Az "egész" osztály
+class Szamitogep {
+private:
+    // Kompozíció: A CPU a Szamitogep adattagja
+    CPU processzor; 
+
+public:
+    // Konstruktor
+    // A "processzor" adattagot az inicializáló listán KELL beállítani,
+    // mielőtt a konstruktor törzse lefutna.
+    Szamitogep(int freq) : processzor(freq) {
+        std::cout << "Szamitogep bekapcsolva." << std::endl;
+    }
+
+    void futtat() {
+        // A feladatot delegáljuk a belső objektumnak
+        processzor.dolgozik(); 
+    }
+}; 
+// Destruktor lefutásakor: először a Szamitogep szűnik meg, 
+// majd automatikusan a processzor is.
+
+int main() {
+    Szamitogep pc(3200);
+    pc.futtat();
+    return 0;
+}
+\end{minted}
